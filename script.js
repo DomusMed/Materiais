@@ -68,3 +68,35 @@ function updateProgress() {
 window.addEventListener('scroll', updateProgress);
 window.addEventListener('resize', updateProgress);
 updateProgress();
+
+// Cria os elementos dinamicamente (opcional)
+function criarSidebar() {
+  // Botão
+  const btn = document.createElement('button');
+  btn.id = 'toggle-btn';
+  btn.innerHTML = '<span class="icon">☰</span><span class="label">Sumário</span>';
+  document.body.appendChild(btn);
+
+  // Sidebar
+  const sidebar = document.createElement('div');
+  sidebar.id = 'sidebar';
+  const ul = document.createElement('ul');
+  ul.id = 'lista-sumario';
+  sidebar.appendChild(ul);
+  document.body.appendChild(sidebar);
+}
+
+// Inicializa o toggle
+function initSidebar() {
+  const toggleBtn = document.getElementById('toggle-btn');
+  const sidebar = document.getElementById('sidebar');
+
+  toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+    document.body.classList.toggle('sidebar-open');
+  });
+}
+
+// Chamada para criar elementos e ativar toggle
+criarSidebar();
+initSidebar();

@@ -2,14 +2,19 @@
        Script da Capa
        ============================ -->
 
+
+<script>
   const img = document.getElementById("capa");
   img.src = img.src + "?t=" + new Date().getTime();
+</script>
+
 
   <!-- ============================
        Script do Sumário
        ============================ -->
 
-      const headers = document.querySelectorAll("h0, h1, h2");
+  <script>
+  const headers = document.querySelectorAll("h0, h1, h2");
   const lista = document.getElementById("lista-sumario");
 
   headers.forEach((header, index) => {
@@ -37,6 +42,10 @@
     document.body.classList.toggle("sidebar-open");
   });
 
+
+  </script>
+
+
   <!-- ============================
        Barra de Progresso
        ============================ -->
@@ -46,6 +55,9 @@
     <div id="progress-bar"></div>
   </div>
 
+
+<!-- JS -->
+<script>
     const progressBar = document.getElementById('progress-bar');
     const readingTimeEl = document.getElementById('reading-time');
     const WPM = 150; // Palavras por minuto
@@ -91,3 +103,6 @@
     window.addEventListener('scroll', updateProgress);
     window.addEventListener('resize', updateProgress);
     updateProgress();
+
+
+</script>

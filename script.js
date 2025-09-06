@@ -10,6 +10,7 @@
  * - Barra de progresso de leitura
  * - Cache bust de imagens
  * - Responsividade e acessibilidade
+ * - Assistente IA com seleção de texto e integração ChatGPT/OpenEvidence
  */
 
 // ============================
@@ -19,9 +20,71 @@
 const CONFIG = {
   WPM: 150, // Palavras por minuto para cálculo de tempo de leitura
   MOBILE_BREAKPOINT: 768, // Breakpoint para dispositivos móveis
-  SCROLL_THROTTLE: 16, // Throttle para eventos de scroll (60fps)
+  SCROLL_THROTTLE: 16, // Throttle para eventos de scroll (60fps )
   SIDEBAR_ANIMATION_DURATION: 300 // Duração da animação da sidebar em ms
 };
+
+// ============================
+// PERGUNTAS PRÉ-FORMULADAS
+// ============================
+
+const PREDEFINED_QUESTIONS = [
+  {
+    short: "Explique este conteúdo de forma simples para uma criança de 10 anos",
+    detailed: "Explique este conteúdo médico como se estivesse ensinando a uma criança de 10 anos, usando analogias simples, mantendo os conceitos corretos, de forma extremamente clara e didática. Foque na compreensão básica sem jargão técnico."
+  },
+  {
+    short: "Resuma o conteúdo em um parágrafo para revisão rápida (nível doutorado)",
+    detailed: "Explique este conteúdo médico em um único parágrafo como resumo de aula de doutorado. Inclua pontos essenciais de fisiopatologia, epidemiologia, manifestações clínicas, diagnóstico diferencial, exames relevantes, tratamento ou prognóstico. Ressalte aspectos práticos e correlações anatômicas ou clínicas importantes."
+  },
+  {
+    short: "Explique o conteúdo completo detalhado (nível doutorado)",
+    detailed: "Explique este conteúdo médico detalhadamente, como em uma aula de doutorado. Inclua fisiopatologia, epidemiologia, manifestações clínicas, diagnóstico diferencial, exames laboratoriais e de imagem, tratamento, prognóstico e condutas práticas. Faça correlações anatômicas, fisiológicas ou clínicas quando relevante, priorizando informações práticas e objetivas."
+  },
+  {
+    short: "Crie um caso clínico real baseado neste conteúdo",
+    detailed: "Com base neste conteúdo médico, crie um caso clínico realista, incluindo história clínica, exame físico e resultados laboratoriais/exames de imagem relevantes. Destaque pontos importantes para tomada de decisão, diagnóstico e manejo, de forma educativa, sem fornecer respostas prontas."
+  },
+  {
+    short: "Faça um resumo objetivo do conteúdo para estudo prático",
+    detailed: "Faça um resumo conciso do conteúdo médico, destacando sinais e sintomas chave, condutas iniciais, exames relevantes ou conceitos importantes para tomada de decisão clínica rápida, conforme o contexto apresentado."
+  },
+  {
+    short: "Mostre a aplicação prática clínica do conteúdo",
+    detailed: "Explique como os conceitos deste conteúdo médico se aplicam à prática clínica, incluindo sinais, sintomas, exames laboratoriais e condutas iniciais. Foque em informações práticas e objetivas, sem se aprofundar em aspectos teóricos irrelevantes."
+  },
+  {
+    short: "Gere uma pergunta de revisão sobre este conteúdo",
+    detailed: "Gere uma pergunta de revisão sobre este conteúdo médico, incluindo múltipla escolha ou dissertativa curta, abordando fisiopatologia, diagnóstico, manejo clínico ou condutas urgentes. Foque em pontos práticos aplicáveis na residência médica."
+  },
+  {
+    short: "Quais protocolos clínicos se aplicam a este conteúdo?",
+    detailed: "Liste e explique os protocolos clínicos, guidelines ou condutas baseadas em evidência para este conteúdo médico. Enfatize condutas práticas, urgentes ou de rotina, e pontos críticos para tomada de decisão na clínica do paciente."
+  },
+  {
+    short: "Quais são as evidências de tratamento mais recentes?",
+    detailed: "Liste e explique as evidências científicas mais recentes relacionadas ao tratamento desta condição. Inclua comparações de condutas terapêuticas, eficácia, riscos, efeitos adversos e recomendações práticas baseadas em guidelines reconhecidas."
+  },
+  {
+    short: "Como diagnosticar esta condição com base em evidências?",
+    detailed: "Quais são os principais achados clínicos, laboratoriais e de imagem indicados pelas evidências para o diagnóstico desta condição? Destaque exames de maior sensibilidade e especificidade, critérios diagnósticos aceitos e recomendações práticas."
+  },
+  {
+    short: "Explique a fisiopatologia desta condição",
+    detailed: "Explique a fisiopatologia desta condição com base nas evidências disponíveis, incluindo mecanismos moleculares, alterações anatômicas e correlações clínicas relevantes, de forma objetiva e prática para aplicação em estudos clínicos ou residência médica."
+  },
+  {
+    short: "Crie um caso clínico educativo baseado em evidências",
+    detailed: "Com base nas evidências do OpenEvidence, crie um caso clínico educativo, incluindo história clínica, exame físico, achados laboratoriais e exames de imagem. Destaque pontos de decisão clínica, diagnóstico diferencial e manejo, visando aprendizado prático para residência médica."
+  }
+];
+
+// ============================
+// VARIÁVEIS GLOBAIS DO ASSISTENTE IA
+// ============================
+
+let selectedText = '';
+let currentPlatform = 'chatgpt';
 
 // ============================
 // UTILITÁRIOS
@@ -57,6 +120,287 @@ function addFadeInClass(element) {
   if (element) {
     element.classList.add('fade-in');
   }
+}
+
+// ============================
+// FUNCIONALIDADES DO ASSISTENTE IA
+// ============================
+
+/**
+ * Copia texto para a área de transferência
+ */
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    console.log('Texto copiado para a área de transferência');
+    return true;
+  } catch (err) {
+    console.error('Erro ao copiar texto:', err);
+    // Fallback para navegadores mais antigos
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      return true;
+    } catch (fallbackErr) {
+      console.error('Erro no fallback de cópia:', fallbackErr);
+      document.body.removeChild(textArea);
+      return false;
+    }
+  }
+}
+
+/**
+ * Abre ChatGPT em nova aba com a pergunta e texto selecionado
+ */
+function openChatGPT(question) {
+  const fullPrompt = selectedText ? `${question}\n\nTexto selecionado:\n${selectedText}` : question;
+  copyToClipboard(fullPrompt);
+  window.open('https://chat.openai.com/', '_blank' );
+  showNotification('Pergunta copiada! Cole no ChatGPT.');
+}
+
+/**
+ * Carrega OpenEvidence no iframe e copia a pergunta
+ */
+function loadOpenEvidence(question) {
+  const fullPrompt = selectedText ? `${question}\n\nTexto selecionado:\n${selectedText}` : question;
+  copyToClipboard(fullPrompt);
+  
+  const iframeContainer = document.getElementById('openevidence-iframe-container');
+  const iframe = document.getElementById('openevidence-iframe');
+  
+  if (iframeContainer && iframe) {
+    iframeContainer.style.display = 'block';
+    iframe.src = 'https://openevidence.com';
+    showNotification('Pergunta copiada! Cole no OpenEvidence abaixo.' );
+  }
+}
+
+/**
+ * Mostra notificação temporária
+ */
+function showNotification(message) {
+  // Remove notificação existente
+  const existingNotification = document.querySelector('.ai-notification');
+  if (existingNotification) {
+    existingNotification.remove();
+  }
+
+  const notification = document.createElement('div');
+  notification.className = 'ai-notification';
+  notification.textContent = message;
+  document.body.appendChild(notification);
+
+  // Remove após 3 segundos
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove();
+    }
+  }, 3000);
+}
+
+/**
+ * Lida com seleção de texto na página
+ */
+function handleTextSelection() {
+  const selection = window.getSelection();
+  const text = selection.toString().trim();
+  
+  if (text.length > 0) {
+    selectedText = text;
+    updateSelectedTextDisplay();
+  }
+}
+
+/**
+ * Atualiza a exibição do texto selecionado no modal
+ */
+function updateSelectedTextDisplay() {
+  const container = document.getElementById('selected-text-container');
+  const textDiv = document.getElementById('selected-text');
+  
+  if (container && textDiv) {
+    if (selectedText) {
+      textDiv.textContent = selectedText;
+      container.style.display = 'block';
+    } else {
+      container.style.display = 'none';
+    }
+  }
+}
+
+/**
+ * Alterna entre plataformas (ChatGPT/OpenEvidence)
+ */
+function switchPlatform(platform) {
+  currentPlatform = platform;
+  
+  // Atualiza botões de plataforma
+  const chatgptBtn = document.getElementById('chatgpt-btn');
+  const openevidenceBtn = document.getElementById('openevidence-btn');
+  const iframeContainer = document.getElementById('openevidence-iframe-container');
+  
+  if (chatgptBtn && openevidenceBtn) {
+    chatgptBtn.classList.toggle('active', platform === 'chatgpt');
+    openevidenceBtn.classList.toggle('active', platform === 'openevidence');
+  }
+  
+  // Mostra/esconde iframe do OpenEvidence
+  if (iframeContainer) {
+    iframeContainer.style.display = platform === 'openevidence' ? 'block' : 'none';
+  }
+}
+
+/**
+ * Processa pergunta (pré-formulada ou personalizada)
+ */
+function processQuestion(question) {
+  if (currentPlatform === 'chatgpt') {
+    openChatGPT(question);
+  } else {
+    loadOpenEvidence(question);
+  }
+}
+
+/**
+ * Cria botões de perguntas pré-formuladas
+ */
+function createPredefinedQuestionButtons() {
+  const container = document.getElementById('questions-container');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  PREDEFINED_QUESTIONS.forEach((question, index) => {
+    const button = document.createElement('button');
+    button.className = 'question-btn';
+    button.textContent = question.short;
+    button.title = question.detailed;
+    
+    button.addEventListener('click', () => {
+      processQuestion(question.detailed);
+    });
+    
+    container.appendChild(button);
+  });
+}
+
+/**
+ * Abre o modal do assistente IA
+ */
+function openAIModal() {
+  const modal = document.getElementById('ai-modal');
+  const overlay = document.getElementById('ai-modal-overlay');
+  
+  if (modal && overlay) {
+    modal.style.display = 'block';
+    overlay.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    
+    // Atualiza texto selecionado
+    updateSelectedTextDisplay();
+    
+    setTimeout(() => {
+      modal.classList.add('active');
+      overlay.classList.add('active');
+    }, 10);
+  }
+}
+
+/**
+ * Fecha o modal do assistente IA
+ */
+function closeAIModal() {
+  const modal = document.getElementById('ai-modal');
+  const overlay = document.getElementById('ai-modal-overlay');
+  
+  if (modal && overlay) {
+    modal.classList.remove('active');
+    overlay.classList.remove('active');
+    
+    setTimeout(() => {
+      modal.style.display = 'none';
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }, 300);
+  }
+}
+
+/**
+ * Configura event listeners do assistente IA
+ */
+function setupAIEventListeners() {
+  // Botão para abrir modal
+  const aiBtn = document.getElementById('ai-assistant-btn');
+  if (aiBtn) {
+    aiBtn.addEventListener('click', openAIModal);
+  }
+
+  // Botão para fechar modal
+  const closeBtn = document.getElementById('ai-modal-close');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeAIModal);
+  }
+
+  // Overlay para fechar modal
+  const overlay = document.getElementById('ai-modal-overlay');
+  if (overlay) {
+    overlay.addEventListener('click', closeAIModal);
+  }
+
+  // Botões de plataforma
+  const chatgptBtn = document.getElementById('chatgpt-btn');
+  const openevidenceBtn = document.getElementById('openevidence-btn');
+  
+  if (chatgptBtn) {
+    chatgptBtn.addEventListener('click', () => switchPlatform('chatgpt'));
+  }
+  
+  if (openevidenceBtn) {
+    openevidenceBtn.addEventListener('click', () => switchPlatform('openevidence'));
+  }
+
+  // Botão de enviar pergunta personalizada
+  const sendCustomBtn = document.getElementById('send-custom-btn');
+  if (sendCustomBtn) {
+    sendCustomBtn.addEventListener('click', () => {
+      const customQuestion = document.getElementById('custom-question');
+      if (customQuestion && customQuestion.value.trim()) {
+        processQuestion(customQuestion.value.trim());
+        customQuestion.value = '';
+      }
+    });
+  }
+
+  // Enter no textarea para enviar
+  const customQuestion = document.getElementById('custom-question');
+  if (customQuestion) {
+    customQuestion.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const sendBtn = document.getElementById('send-custom-btn');
+        if (sendBtn) sendBtn.click();
+      }
+    });
+  }
+
+  // Seleção de texto na página
+  document.addEventListener('mouseup', handleTextSelection);
+  document.addEventListener('keyup', handleTextSelection);
+
+  // ESC para fechar modal
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('ai-modal');
+      if (modal && modal.classList.contains('active')) {
+        closeAIModal();
+      }
+    }
+  });
 }
 
 // ============================
@@ -432,109 +776,3 @@ function setupEventListeners() {
     // Suporte a teclado
     toggleBtn.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        toggleSidebar();
-      }
-    });
-  }
-  
-  // Eventos de scroll com throttle
-  const throttledUpdateProgress = throttle(updateProgress, CONFIG.SCROLL_THROTTLE);
-  window.addEventListener('scroll', throttledUpdateProgress);
-  
-  // Eventos de redimensionamento
-  window.addEventListener('resize', () => {
-    updateProgress();
-    
-    // Fecha sidebar em desktop se estiver aberta
-    if (!isMobile()) {
-      const overlay = document.getElementById('sidebar-overlay');
-      if (overlay && overlay.classList.contains('active')) {
-        closeSidebar();
-      }
-    }
-  });
-  
-  // Tecla ESC para fechar sidebar
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      const sidebar = document.getElementById('sidebar');
-      if (sidebar && sidebar.classList.contains('active')) {
-        closeSidebar();
-      }
-    }
-  });
-  
-  console.log('Event listeners configurados');
-}
-
-/**
- * Inicialização principal do script
- */
-function initializeApp() {
-  console.log('Inicializando aplicação...');
-  
-  try {
-    // 1. Aplica cache bust nas imagens
-    applyCacheBust();
-    
-    // 2. Cria elementos de interface dinamicamente
-    createProgressBar();
-    createToggleButton();
-    createSidebar();
-    
-    // 3. Gera sumário automaticamente
-    generateSummary();
-    
-    // 4. Configura event listeners
-    setupEventListeners();
-    
-    // 5. Atualiza progresso inicial
-    updateProgress();
-    
-    console.log('Aplicação inicializada com sucesso!');
-    
-  } catch (error) {
-    console.error('Erro durante a inicialização:', error);
-  }
-}
-
-/**
- * Função de reinicialização para novos conteúdos
- * Útil quando o conteúdo da página é alterado dinamicamente
- */
-function reinitialize() {
-  console.log('Reinicializando aplicação...');
-  
-  // Regenera sumário
-  generateSummary();
-  
-  // Atualiza progresso
-  updateProgress();
-  
-  console.log('Aplicação reinicializada');
-}
-
-// ============================
-// INICIALIZAÇÃO AUTOMÁTICA
-// ============================
-
-// Aguarda o DOM estar pronto
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeApp);
-} else {
-  // DOM já está pronto
-  initializeApp();
-}
-
-// Expõe funções globais para uso externo se necessário
-window.MedicalResumeApp = {
-  reinitialize,
-  toggleSidebar,
-  openSidebar,
-  closeSidebar,
-  updateProgress,
-  generateSummary
-};
-
-console.log('Script do modelo de resumos médicos carregado');

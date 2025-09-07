@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Título do Resumo</title>
+
+  <!-- CSS externo centralizado -->
+
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+  <!-- Imagem de capa -->
+  <img id="capa" 
+       src="https://lh3.googleusercontent.com/d/1vTRZomTJ1MkH6v4pkyYkonIY0EyPJrQq"   // A partir da última barra vai a ID da imagem
+       alt="Imagem de Capa">
+
+  <!-- Conteúdo do resumo -->
+
+  <hr>
+
+  <h1>Título 01</h1>
+
+  <h2>Título 02</h2>
+  <p>O texto referente ao conteúdo deve ser colocado aqui, nesta seção. O texto pode conter algumas palavras em <strong>negrito</strong> para chamar a atenção e outras em <em>itálico</em> para dar ênfase especial a determinados termos.</p>
+
+  <div class="destaque">
+    <strong>🧠 Lembre-se:</strong> Texto importante, colocar aqui.
+  </div>
+
+  <h3>Título 03</h3>
+  <p>O texto referente ao conteúdo deve ser colocado aqui, nesta seção. O texto pode conter algumas palavras em <strong>negrito</strong> para chamar a atenção e outras em <em>itálico</em> para dar ênfase especial a determinados termos.</p>
+
+  <ul>
+    <li><strong>Texto:</strong> aqui</li>
+    <li><strong>Texto:</strong> aqui</li>
+    <li><strong>Texto:</strong> aqui</li>
+  </ul>
+
+  <hr>
+
+  <h1>Título 01</h1>
+
+  <h2>Título 02</h2>
+  <p>O texto referente ao conteúdo deve ser colocado aqui, nesta seção. O texto pode conter algumas palavras em <strong>negrito</strong> para chamar a atenção e outras em <em>itálico</em> para dar ênfase especial a determinados termos.</p>
+
+  <h3>Título 03</h3>
+
+  <p>O texto referente ao conteúdo deve ser colocado aqui, nesta seção. O texto pode conter algumas palavras em <strong>negrito</strong> para chamar a atenção e outras em <em>itálico</em> para dar ênfase especial a determinados termos.</p>
+
+  <div class="tabela-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Coluna 01, linha 01</th>
+          <th>Coluna 02, linha 01</th>
+          <th>Coluna 03, linha 01</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Coluna 01, linha 02</td>
+          <td>Coluna 02, linha 02</td>
+          <td>Coluna 03, linha 02</td>
+        </tr>
+        <tr>
+          <td>Coluna 01, linha 03</td>
+          <td>Coluna 02, linha 03</td>
+          <td>Coluna 03, linha 03</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Título 03</h3>
+  <p>O texto referente ao conteúdo deve ser colocado aqui, nesta seção. O texto pode conter algumas palavras em <strong>negrito</strong> para chamar a atenção e outras em <em>itálico</em> para dar ênfase especial a determinados termos.</p>
+
+  <div class="destaque">
+    <strong>🔬 Texto:</strong> Aqui vai o texto importante!
+  </div>
+
+<p>O texto referente ao conteúdo deve ser colocado aqui, nesta seção. O texto pode conter algumas palavras em <strong>negrito</strong> para chamar a atenção e outras em <em>itálico</em> para dar ênfase especial a determinados termos.</p>
+
+  <h4>Título 04</h4>
+  <ul>
+    <li>Item 01</li>
+    <li>Item 02</li>
+    <li>Item 03</li>
+  </ul>
+
+  <h5>Título 05</h5>
+  <p>O texto referente ao conteúdo deve ser colocado aqui, nesta seção. O texto pode conter algumas palavras em <strong>negrito</strong> para chamar a atenção e outras em <em>itálico</em> para dar ênfase especial a determinados termos.</p>
+
+  <hr>
+
+  <!-- Rodapé DomusMed -->
+  <footer class="footer-domus">
+    <div class="footer-container">
+      <img id="domus-logo" 
+           src="https://lh3.googleusercontent.com/d/1WxpgCfXYRTI5EJha58DVulaQhJpeYOaM"   // A partir da última barra vai a ID da imagem
+           alt="Logo DomusMed">
+      <span class="footer-text">© 2025 DomusMed - Todos os direitos reservados</span>
+    </div>
+  </footer>
+
+  <!-- Botão fixo para abrir janela flutuante -->
+  <button id="ai-assistant-btn" class="ai-assistant-btn" title="Assistente IA">
+    <span class="ai-icon">🤖</span>
+    <span class="ai-label">IA</span>
+  </button>
+
+  <!-- Janela flutuante (modal) -->
+  <div id="ai-modal" class="ai-modal">
+    <div class="ai-modal-content">
+      <!-- Cabeçalho do modal -->
+      <div class="ai-modal-header">
+        <p><strong style="font-size: 35px;">📚 Assistente de Estudos</strong></p>
+        <button id="ai-modal-close" class="ai-modal-close">&times;</button>
+      </div>
+
+      <!-- Corpo do modal -->
+      <div class="ai-modal-body">
+        <!-- Texto selecionado -->
+        <div id="selected-text-container" class="selected-text-container" style="display: none;">
+          <p><strong style="font-size: 25px;">Texto Selecionado</strong></p>
+          <div id="selected-text" class="selected-text"></div>
+        </div>
+
+        <!-- Seleção de plataforma -->
+        <div class="platform-selection">
+          </p><p><strong style="font-size: 25px;">Escolha a Plataforma</strong></p>
+          <div class="platform-buttons">
+            <!-- Botões serão gerados dinamicamente pelo JavaScript -->
+          </div>
+        </div>
+
+        <!-- Perguntas pré-formuladas -->
+        <div class="predefined-questions">
+          <p><strong style="font-size: 25px;">Perguntas Relevantes</strong></p>
+          <div id="questions-container" class="questions-container">
+            <!-- Botões serão gerados dinamicamente pelo JavaScript -->
+          </div>
+        </div>
+
+        <!-- Campo de entrada personalizada -->
+        <div class="custom-input">
+          <p><strong style="font-size: 25px;">Pergunta Personalizada</strong></p>
+          <textarea id="custom-question" class="custom-question-input" placeholder="Digite sua dúvida específica aqui..."></textarea>
+          <button id="send-custom-btn" class="send-custom-btn">Enviar Pergunta</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay do modal -->
+  <div id="ai-modal-overlay" class="ai-modal-overlay"></div>
+
+  <!-- JavaScript externo com toda a lógica -->
+  <script src="script.js"></script>
+
+</body>
+</html>

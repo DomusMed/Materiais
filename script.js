@@ -440,6 +440,9 @@ function applyCacheBust() {
   });
 }
 
+// Executa após carregar a página
+window.addEventListener('load', applyCacheBust);
+
 // ============================
 // CRIAÇÃO DINÂMICA DE ELEMENTOS DE INTERFACE
 // ============================

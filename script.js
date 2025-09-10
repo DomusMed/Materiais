@@ -30,8 +30,8 @@ const CONFIG = {
   SIDEBAR_ANIMATION_DURATION: 300, // Duração da animação da sidebar em ms
   
   // Configurações do Supabase - SUBSTITUA PELAS SUAS CHAVES
-  SUPABASE_URL: 'YOUR_SUPABASE_URL', // Exemplo: 'https://xyzcompany.supabase.co'
-  SUPABASE_ANON_KEY: 'YOUR_SUPABASE_ANON_KEY', // Chave pública do Supabase
+  SUPABASE_URL: 'https://awirwulznmvwzaljpnai.supabase.co', // Exemplo: 'https://xyzcompany.supabase.co'
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3aXJ3dWx6bm12d3phbGpwbmFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NDAyNTMsImV4cCI6MjA3MzExNjI1M30.GSTjSVlUChh-E0mKVnd4gosXTusAXo-F0mOcLXgoDJw', // Chave pública do Supabase
   
   // URLs para contato e sugestões
   CONTACT_EMAIL: 'contato@domusmed.site',

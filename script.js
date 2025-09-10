@@ -2038,4 +2038,3 @@ window.MedicalResumeApp = {
 };
 
 console.log('Script do modelo de resumos médicos carregado');
-

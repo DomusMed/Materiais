@@ -59,7 +59,7 @@ const PREDEFINED_QUESTIONS = [
     detailed: "Explique este conteúdo médico como se estivesse ensinando a uma criança de 10 anos, usando analogias simples, mantendo os conceitos corretos, de forma extremamente clara e didática. Foque na compreensão básica sem jargão técnico."
   },
   {
-    short: "Resuma o conteúdo em um parágrafo para revisão rápida (nível doutorado)",
+    short: "Resuma o conteúdo em um parágrafo para revisão rápida (nível doutorado )",
     detailed: "Explique este conteúdo médico em um único parágrafo como resumo de aula de doutorado. Inclua pontos essenciais de fisiopatologia, epidemiologia, manifestações clínicas, diagnóstico diferencial, exames relevantes, tratamento ou prognóstico. Ressalte aspectos práticos e correlações anatômicas ou clínicas importantes."
   },
   {
@@ -128,7 +128,7 @@ let isDarkTheme = false;
 function initializeSupabase() {
   try {
     // Verifica se as chaves foram configuradas
-    if (CONFIG.SUPABASE_URL === 'https://awirwulznmvwzaljpnai.supabase.co' || CONFIG.SUPABASE_ANON_KEY === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3aXJ3dWx6bm12d3phbGpwbmFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NDAyNTMsImV4cCI6MjA3MzExNjI1M30.GSTjSVlUChh-E0mKVnd4gosXTusAXo-F0mOcLXgoDJw') {
+    if (!CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY) {
       console.warn('⚠️ Configurações do Supabase não foram definidas. Funcionalidades de login e sincronização estarão desabilitadas.');
       console.warn('📖 Consulte o arquivo Guia_Supabase.md para instruções de configuração.');
       return false;
@@ -487,37 +487,35 @@ function createNoteElement(note) {
 /**
  * Edita uma anotação
  */
-function editNote(noteId, currentText) {
+async function editNote(noteId, currentText) {
   const newText = prompt('Editar anotação:', currentText);
-  if (newText && newText.trim() !== currentText) {
-    updateNote(noteId, newText.trim());
+  if (newText !== null && newText.trim() !== '') {
+    await updateNote(noteId, newText);
   }
 }
 
 /**
- * Adiciona uma nova anotação
+ * Filtra anotações por texto
  */
-function addNewNote() {
-  const noteText = prompt('Digite sua anotação:');
-  if (noteText && noteText.trim()) {
-    saveNote(noteText.trim(), selectedText);
-  }
-}
-
-/**
- * Filtra anotações por texto de busca
- */
-function filterNotes(searchText) {
-  const noteItems = document.querySelectorAll('.note-item');
-  const searchLower = searchText.toLowerCase();
+function filterNotes(query) {
+  const filteredNotes = currentNotes.filter(note => 
+    note.note.toLowerCase().includes(query.toLowerCase()) ||
+    note.text_selected.toLowerCase().includes(query.toLowerCase())
+  );
   
-  noteItems.forEach(item => {
-    const noteText = item.querySelector('.note-text').textContent.toLowerCase();
-    if (noteText.includes(searchLower)) {
-      item.style.display = 'block';
-    } else {
-      item.style.display = 'none';
-    }
+  const notesList = document.getElementById('notes-list');
+  if (!notesList) return;
+  
+  notesList.innerHTML = '';
+  
+  if (filteredNotes.length === 0) {
+    notesList.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">Nenhuma anotação encontrada</p>';
+    return;
+  }
+  
+  filteredNotes.forEach(note => {
+    const noteElement = createNoteElement(note);
+    notesList.appendChild(noteElement);
   });
 }
 
@@ -526,1516 +524,636 @@ function filterNotes(searchText) {
 // ============================
 
 /**
- * Carrega checklist do usuário
+ * Carrega o estado do checklist do Supabase ou localStorage
  */
 async function loadUserChecklist() {
-  if (!supabaseClient || !currentUser) {
-    // Se não estiver logado, carrega do localStorage
-    loadChecklistFromLocalStorage();
-    return;
-  }
-  
-  try {
-    const summaryId = getSummaryId();
-    const { data, error } = await supabaseClient
-      .from('checklist')
-      .select('*')
-      .eq('user_id', currentUser.id)
-      .eq('summary_id', summaryId);
-    
-    if (error) {
-      console.error('Erro ao carregar checklist:', error);
-      loadChecklistFromLocalStorage();
-      return;
+  if (currentUser) {
+    // Tenta carregar do Supabase
+    if (!supabaseClient) return;
+    try {
+      const summaryId = getSummaryId();
+      const { data, error } = await supabaseClient
+        .from('checklist')
+        .select('items')
+        .eq('user_id', currentUser.id)
+        .eq('summary_id', summaryId)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') { // PGRST116 = No rows found
+        console.error('Erro ao carregar checklist do Supabase:', error);
+      } else if (data) {
+        checklistItems = data.items || [];
+        console.log('Checklist carregado do Supabase.');
+      } else {
+        console.log('Nenhum checklist encontrado no Supabase para este usuário/resumo.');
+        checklistItems = []; // Garante que esteja vazio se não houver dados
+      }
+    } catch (error) {
+      console.error('Erro ao carregar checklist do Supabase:', error);
+      checklistItems = [];
     }
-    
-    if (data && data.length > 0) {
-      checklistItems = data[0].items || [];
-    } else {
-      // Se não há checklist salvo, cria um novo baseado nos títulos
-      generateChecklistFromTitles();
-    }
-    
-    updateChecklistUI();
-    console.log(`Checklist carregado com ${checklistItems.length} itens`);
-  } catch (error) {
-    console.error('Erro ao carregar checklist:', error);
-    loadChecklistFromLocalStorage();
-  }
-}
-
-/**
- * Salva checklist no Supabase
- */
-async function saveUserChecklist() {
-  if (!supabaseClient || !currentUser) {
-    // Se não estiver logado, salva no localStorage
-    saveChecklistToLocalStorage();
-    return;
-  }
-  
-  try {
-    const summaryId = getSummaryId();
-    const { error } = await supabaseClient
-      .from('checklist')
-      .upsert([
-        {
-          user_id: currentUser.id,
-          summary_id: summaryId,
-          items: checklistItems,
-          updated_at: new Date().toISOString()
-        }
-      ]);
-    
-    if (error) {
-      console.error('Erro ao salvar checklist:', error);
-      saveChecklistToLocalStorage();
-      return;
-    }
-    
-    console.log('Checklist salvo no Supabase');
-  } catch (error) {
-    console.error('Erro ao salvar checklist:', error);
-    saveChecklistToLocalStorage();
-  }
-}
-
-/**
- * Carrega checklist do localStorage
- */
-function loadChecklistFromLocalStorage() {
-  const summaryId = getSummaryId();
-  const saved = localStorage.getItem(`checklist_${summaryId}`);
-  if (saved) {
-    checklistItems = JSON.parse(saved);
   } else {
-    generateChecklistFromTitles();
+    // Carrega do localStorage se não logado
+    const storedChecklist = localStorage.getItem('checklistItems_' + getSummaryId());
+    if (storedChecklist) {
+      checklistItems = JSON.parse(storedChecklist);
+      console.log('Checklist carregado do localStorage.');
+    } else {
+      checklistItems = [];
+    }
   }
   updateChecklistUI();
 }
 
 /**
- * Salva checklist no localStorage
+ * Salva o estado do checklist no Supabase ou localStorage
  */
-function saveChecklistToLocalStorage() {
-  const summaryId = getSummaryId();
-  localStorage.setItem(`checklist_${summaryId}`, JSON.stringify(checklistItems));
+async function saveChecklist() {
+  if (currentUser) {
+    // Salva no Supabase
+    if (!supabaseClient) return;
+    try {
+      const summaryId = getSummaryId();
+      const { data, error } = await supabaseClient
+        .from('checklist')
+        .upsert(
+          {
+            user_id: currentUser.id,
+            summary_id: summaryId,
+            items: checklistItems,
+            updated_at: new Date().toISOString()
+          },
+          { onConflict: ['user_id', 'summary_id'] }
+        )
+        .select();
+      
+      if (error) {
+        console.error('Erro ao salvar checklist no Supabase:', error);
+        showNotification('Erro ao salvar checklist');
+      } else {
+        console.log('Checklist salvo no Supabase.');
+      }
+    } catch (error) {
+      console.error('Erro ao salvar checklist no Supabase:', error);
+      showNotification('Erro ao salvar checklist');
+    }
+  } else {
+    // Salva no localStorage se não logado
+    localStorage.setItem('checklistItems_' + getSummaryId(), JSON.stringify(checklistItems));
+    console.log('Checklist salvo no localStorage.');
+  }
 }
 
 /**
- * Gera checklist baseado nos títulos da página
+ * Gera o checklist com base nos títulos do documento
  */
-function generateChecklistFromTitles() {
-  const headers = document.querySelectorAll('h1, h2, h3, h4, h5');
-  checklistItems = [];
-  
-  headers.forEach((header, index) => {
-    checklistItems.push({
-      id: `item_${index}`,
-      title: header.textContent.trim(),
-      completed: false
+function generateChecklist() {
+  const contentDiv = document.getElementById('content');
+  if (!contentDiv) return [];
+
+  const headings = contentDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
+  const newChecklistItems = [];
+
+  headings.forEach((heading, index) => {
+    const level = parseInt(heading.tagName.substring(1));
+    const text = heading.textContent.trim();
+    // Verifica se o item já existe no checklist atual para preservar o estado 'completed'
+    const existingItem = checklistItems.find(item => item.text === text && item.level === level);
+    newChecklistItems.push({
+      id: `item-${index}`,
+      text: text,
+      level: level,
+      completed: existingItem ? existingItem.completed : false
     });
   });
-  
-  console.log(`Checklist gerado com ${checklistItems.length} itens`);
+  checklistItems = newChecklistItems;
+  saveChecklist(); // Salva o checklist gerado (ou atualizado)
+  return newChecklistItems;
 }
 
 /**
  * Atualiza a interface do checklist
  */
 function updateChecklistUI() {
-  const checklistContainer = document.getElementById('checklist-items');
-  const progressBar = document.getElementById('checklist-progress-bar');
-  const progressText = document.getElementById('checklist-progress-text');
-  
-  if (!checklistContainer) return;
-  
-  checklistContainer.innerHTML = '';
-  
+  const checklistContent = document.getElementById('checklist-content');
+  if (!checklistContent) return;
+
+  checklistContent.innerHTML = ''; // Limpa o conteúdo existente
+
+  if (checklistItems.length === 0) {
+    generateChecklist(); // Gera o checklist se estiver vazio
+  }
+
+  const ul = document.createElement('ul');
+  ul.className = 'checklist-list';
+
   checklistItems.forEach(item => {
-    const itemElement = createChecklistItemElement(item);
-    checklistContainer.appendChild(itemElement);
+    const li = document.createElement('li');
+    li.className = `checklist-item level-${item.level}`;
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = `checklist-${item.id}`;
+    checkbox.checked = item.completed;
+    checkbox.onchange = () => toggleChecklistItem(item.id);
+
+    const label = document.createElement('label');
+    label.htmlFor = `checklist-${item.id}`;
+    label.textContent = item.text;
+
+    li.appendChild(checkbox);
+    li.appendChild(label);
+    ul.appendChild(li);
   });
-  
-  // Atualiza progresso
-  const completedCount = checklistItems.filter(item => item.completed).length;
-  const totalCount = checklistItems.length;
-  const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-  
-  if (progressBar) {
-    progressBar.style.width = `${percentage}%`;
-  }
-  
-  if (progressText) {
-    progressText.textContent = `${percentage}% concluído (${completedCount}/${totalCount})`;
-  }
+
+  checklistContent.appendChild(ul);
 }
 
 /**
- * Cria elemento HTML para item do checklist
+ * Alterna o estado de um item do checklist
  */
-function createChecklistItemElement(item) {
-  const itemDiv = document.createElement('div');
-  itemDiv.className = `checklist-item ${item.completed ? 'completed' : ''}`;
-  
-  const checkbox = document.createElement('input');
-  checkbox.type = 'checkbox';
-  checkbox.className = 'checklist-checkbox';
-  checkbox.checked = item.completed;
-  checkbox.onchange = () => toggleChecklistItem(item.id);
-  
-  const label = document.createElement('label');
-  label.className = 'checklist-label';
-  label.textContent = item.title;
-  label.onclick = () => toggleChecklistItem(item.id);
-  
-  itemDiv.appendChild(checkbox);
-  itemDiv.appendChild(label);
-  
-  return itemDiv;
-}
-
-/**
- * Alterna estado de um item do checklist
- */
-function toggleChecklistItem(itemId) {
-  const item = checklistItems.find(item => item.id === itemId);
+function toggleChecklistItem(id) {
+  const item = checklistItems.find(item => item.id === id);
   if (item) {
     item.completed = !item.completed;
-    updateChecklistUI();
-    saveUserChecklist();
+    saveChecklist();
+    updateChecklistUI(); // Atualiza a UI para refletir a mudança
   }
 }
 
 // ============================
-// SISTEMA DE PREFERÊNCIAS
+// EXPORTAR PDF
 // ============================
 
 /**
- * Carrega preferências do usuário
+ * Exporta o conteúdo principal e anotações para PDF
+ */
+async function exportToPdf() {
+  showNotification('Gerando PDF... Isso pode levar alguns segundos.');
+  
+  // Adiciona o CDN do jsPDF dinamicamente se ainda não estiver presente
+  if (typeof jspdf === 'undefined') {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    script.onload = async ( ) => {
+      await generatePdfContent();
+    };
+    script.onerror = () => {
+      showNotification('Erro ao carregar jsPDF. Verifique sua conexão.');
+      console.error('Erro ao carregar jsPDF CDN.');
+    };
+    document.head.appendChild(script);
+  } else {
+    await generatePdfContent();
+  }
+}
+
+async function generatePdfContent() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  const content = document.getElementById('content');
+  const notesList = document.getElementById('notes-list');
+  
+  let yOffset = 10;
+  const margin = 10;
+  const lineHeight = 7;
+  const maxWidth = doc.internal.pageSize.getWidth() - 2 * margin;
+  
+  // Adicionar título do resumo
+  doc.setFontSize(24);
+  doc.text(document.title, margin, yOffset);
+  yOffset += 10;
+  
+  // Adicionar data de exportação
+  doc.setFontSize(10);
+  doc.text(`Exportado em: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}`, margin, yOffset);
+  yOffset += 10;
+  
+  // Adicionar conteúdo principal
+  doc.setFontSize(12);
+  const contentText = content.innerText; // Pega todo o texto visível
+  const splitContent = doc.splitTextToSize(contentText, maxWidth);
+  
+  for (const line of splitContent) {
+    if (yOffset + lineHeight > doc.internal.pageSize.getHeight() - margin) {
+      doc.addPage();
+      yOffset = margin;
+    }
+    doc.text(line, margin, yOffset);
+    yOffset += lineHeight;
+  }
+  
+  // Adicionar anotações
+  if (currentNotes.length > 0) {
+    if (yOffset + 20 > doc.internal.pageSize.getHeight() - margin) {
+      doc.addPage();
+      yOffset = margin;
+    }
+    doc.setFontSize(18);
+    doc.text('Minhas Anotações', margin, yOffset);
+    yOffset += 10;
+    
+    doc.setFontSize(10);
+    currentNotes.forEach(note => {
+      const noteText = `"${note.text_selected}" - ${note.note} (${new Date(note.created_at).toLocaleDateString('pt-BR')})`;
+      const splitNote = doc.splitTextToSize(noteText, maxWidth);
+      
+      for (const line of splitNote) {
+        if (yOffset + lineHeight > doc.internal.pageSize.getHeight() - margin) {
+          doc.addPage();
+          yOffset = margin;
+        }
+        doc.text(line, margin, yOffset);
+        yOffset += lineHeight;
+      }
+      yOffset += 5; // Espaço entre as anotações
+    });
+  }
+  
+  // Salvar o PDF
+  const filename = `Resumo_Medico_${new Date().toISOString().slice(0,10)}.pdf`;
+  doc.save(filename);
+  showNotification('PDF gerado com sucesso!');
+}
+
+// ============================
+// CONTROLES DE TEMA E FONTE
+// ============================
+
+/**
+ * Carrega as preferências do usuário (tema e fonte) do Supabase ou localStorage
  */
 async function loadUserPreferences() {
-  if (!supabaseClient || !currentUser) {
-    loadPreferencesFromLocalStorage();
-    return;
-  }
-  
-  try {
-    const { data, error } = await supabaseClient
-      .from('user_preferences')
-      .select('*')
-      .eq('user_id', currentUser.id)
-      .single();
-    
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-      console.error('Erro ao carregar preferências:', error);
-      loadPreferencesFromLocalStorage();
-      return;
+  if (currentUser) {
+    // Tenta carregar do Supabase
+    if (!supabaseClient) return;
+    try {
+      const { data, error } = await supabaseClient
+        .from('user_preferences')
+        .select('theme, font_size')
+        .eq('user_id', currentUser.id)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') { // PGRST116 = No rows found
+        console.error('Erro ao carregar preferências do Supabase:', error);
+      } else if (data) {
+        isDarkTheme = data.theme === 'dark';
+        currentFontSize = data.font_size || 20;
+        console.log('Preferências carregadas do Supabase.');
+      } else {
+        console.log('Nenhuma preferência encontrada no Supabase para este usuário.');
+      }
+    } catch (error) {
+      console.error('Erro ao carregar preferências do Supabase:', error);
     }
-    
-    if (data) {
-      currentFontSize = data.font_size || 20;
-      isDarkTheme = data.dark_theme || false;
-      applyUserPreferences();
-    } else {
-      loadPreferencesFromLocalStorage();
+  } else {
+    // Carrega do localStorage se não logado
+    const storedTheme = localStorage.getItem('themePreference');
+    if (storedTheme) {
+      isDarkTheme = storedTheme === 'dark';
     }
-  } catch (error) {
-    console.error('Erro ao carregar preferências:', error);
-    loadPreferencesFromLocalStorage();
+    const storedFontSize = localStorage.getItem('fontSizePreference');
+    if (storedFontSize) {
+      currentFontSize = parseInt(storedFontSize);
+    }
   }
+  applyTheme();
+  applyFontSize();
 }
 
 /**
- * Salva preferências do usuário
+ * Salva as preferências do usuário (tema e fonte) no Supabase ou localStorage
  */
 async function saveUserPreferences() {
-  if (!supabaseClient || !currentUser) {
-    savePreferencesToLocalStorage();
-    return;
-  }
-  
-  try {
-    const { error } = await supabaseClient
-      .from('user_preferences')
-      .upsert([
-        {
-          user_id: currentUser.id,
-          font_size: currentFontSize,
-          dark_theme: isDarkTheme,
-          updated_at: new Date().toISOString()
-        }
-      ]);
-    
-    if (error) {
-      console.error('Erro ao salvar preferências:', error);
-      savePreferencesToLocalStorage();
-      return;
-    }
-    
-    console.log('Preferências salvas no Supabase');
-  } catch (error) {
-    console.error('Erro ao salvar preferências:', error);
-    savePreferencesToLocalStorage();
-  }
-}
-
-/**
- * Carrega preferências do localStorage
- */
-function loadPreferencesFromLocalStorage() {
-  currentFontSize = parseInt(localStorage.getItem('fontSize')) || 20;
-  isDarkTheme = localStorage.getItem('darkTheme') === 'true';
-  applyUserPreferences();
-}
-
-/**
- * Salva preferências no localStorage
- */
-function savePreferencesToLocalStorage() {
-  localStorage.setItem('fontSize', currentFontSize.toString());
-  localStorage.setItem('darkTheme', isDarkTheme.toString());
-}
-
-/**
- * Aplica preferências do usuário
- */
-function applyUserPreferences() {
-  // Aplica tamanho da fonte
-  document.body.style.fontSize = `${currentFontSize}px`;
-  
-  // Aplica tema
-  if (isDarkTheme) {
-    document.body.classList.add('dark-theme');
-  } else {
-    document.body.classList.remove('dark-theme');
-  }
-  
-  // Atualiza controles da interface
-  updateFontSizeControls();
-  updateThemeToggleButton();
-}
-
-/**
- * Atualiza controles de tamanho da fonte
- */
-function updateFontSizeControls() {
-  const slider = document.getElementById('font-size-slider');
-  const display = document.getElementById('font-size-display');
-  const preview = document.querySelector('.font-preview p');
-  
-  if (slider) slider.value = currentFontSize;
-  if (display) display.textContent = `${currentFontSize}px`;
-  if (preview) preview.style.fontSize = `${currentFontSize}px`;
-}
-
-/**
- * Atualiza botão de alternância de tema
- */
-function updateThemeToggleButton() {
-  const themeBtn = document.getElementById('theme-toggle-tool');
-  if (themeBtn) {
-    const icon = themeBtn.querySelector('.tool-icon');
-    const label = themeBtn.querySelector('.tool-label');
-    
-    if (isDarkTheme) {
-      if (icon) icon.textContent = '☀️';
-      if (label) label.textContent = 'Modo Claro';
-    } else {
-      if (icon) icon.textContent = '🌙';
-      if (label) label.textContent = 'Modo Escuro';
-    }
-  }
-}
-
-// ============================
-// UTILITÁRIOS
-// ============================
-
-/**
- * Função para throttle de eventos
- */
-function throttle(func, limit) {
-  let inThrottle;
-  return function() {
-    const args = arguments;
-    const context = this;
-    if (!inThrottle) {
-      func.apply(context, args);
-      inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
-    }
-  };
-}
-
-/**
- * Verifica se é dispositivo móvel
- */
-function isMobile() {
-  return window.innerWidth <= CONFIG.MOBILE_BREAKPOINT;
-}
-
-/**
- * Adiciona classe com animação fade-in
- */
-function addFadeInClass(element) {
-  if (element) {
-    element.classList.add('fade-in');
-  }
-}
-
-/**
- * Obtém ID único do resumo baseado no título ou URL
- */
-function getSummaryId() {
-  const title = document.querySelector('h0')?.textContent?.trim() || 
-                document.title || 
-                window.location.pathname;
-  return btoa(title).replace(/[^a-zA-Z0-9]/g, '').substring(0, 20);
-}
-
-/**
- * Obtém nome do arquivo atual para usar em emails
- */
-function getCurrentFileName() {
-  const path = window.location.pathname;
-  const fileName = path.split('/').pop() || 'resumo';
-  return fileName.replace('.html', '') || 'resumo';
-}
-
-// ============================
-// FUNCIONALIDADES DO ASSISTENTE IA
-// ============================
-
-/**
- * Copia texto para a área de transferência
- */
-async function copyToClipboard(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    console.log('Texto copiado para a área de transferência');
-    return true;
-  } catch (err) {
-    console.error('Erro ao copiar texto:', err);
-    // Fallback para navegadores mais antigos
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.select();
+  if (currentUser) {
+    // Salva no Supabase
+    if (!supabaseClient) return;
     try {
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      return true;
-    } catch (fallbackErr) {
-      console.error('Erro no fallback de cópia:', fallbackErr);
-      document.body.removeChild(textArea);
-      return false;
+      const { data, error } = await supabaseClient
+        .from('user_preferences')
+        .upsert(
+          {
+            user_id: currentUser.id,
+            theme: isDarkTheme ? 'dark' : 'light',
+            font_size: currentFontSize,
+            updated_at: new Date().toISOString()
+          },
+          { onConflict: ['user_id'] }
+        )
+        .select();
+      
+      if (error) {
+        console.error('Erro ao salvar preferências no Supabase:', error);
+        showNotification('Erro ao salvar preferências');
+      } else {
+        console.log('Preferências salvas no Supabase.');
+      }
+    } catch (error) {
+      console.error('Erro ao salvar preferências no Supabase:', error);
+      showNotification('Erro ao salvar preferências');
     }
-  }
-}
-
-/**
- * Abre uma plataforma de IA em nova aba com a pergunta e texto selecionado
- */
-function openAIPlatform(platform, question) {
-  const fullPrompt = selectedText ? `${question}\n\nTexto selecionado:\n${selectedText}` : question;
-  copyToClipboard(fullPrompt);
-  
-  const url = AI_PLATFORMS[platform];
-  if (url) {
-    window.open(url, '_blank');
-    showNotification(`Pergunta copiada! Cole no ${getPlatformDisplayName(platform)}.`);
   } else {
-    console.error('Plataforma não encontrada:', platform);
+    // Salva no localStorage se não logado
+    localStorage.setItem('themePreference', isDarkTheme ? 'dark' : 'light');
+    localStorage.setItem('fontSizePreference', currentFontSize.toString());
   }
 }
 
 /**
- * Retorna o nome de exibição da plataforma
+ * Aplica o tema (claro/escuro)
  */
-function getPlatformDisplayName(platform) {
-  const names = {
-    chatgpt: 'ChatGPT',
-    openevidence: 'OpenEvidence',
-    consensus: 'Consensus',
-    perplexity: 'Perplexity'
-  };
-  return names[platform] || platform;
+function applyTheme() {
+  const body = document.body;
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
+  if (isDarkTheme) {
+    body.classList.add('dark-mode');
+    if (themeToggleBtn) themeToggleBtn.textContent = '☀️';
+  } else {
+    body.classList.remove('dark-mode');
+    if (themeToggleBtn) themeToggleBtn.textContent = '🌙';
+  }
 }
 
 /**
- * Mostra notificação temporária
+ * Alterna o tema
  */
-function showNotification(message) {
-  // Remove notificação existente
-  const existingNotification = document.querySelector('.ai-notification');
-  if (existingNotification) {
-    existingNotification.remove();
-  }
+function toggleTheme() {
+  isDarkTheme = !isDarkTheme;
+  applyTheme();
+  saveUserPreferences();
+}
 
-  const notification = document.createElement('div');
-  notification.className = 'ai-notification';
+/**
+ * Aplica o tamanho da fonte
+ */
+function applyFontSize() {
+  document.body.style.fontSize = `${currentFontSize}px`;
+}
+
+/**
+ * Ajusta o tamanho da fonte
+ */
+function adjustFontSize(delta) {
+  currentFontSize = Math.max(14, Math.min(30, currentFontSize + delta)); // Limita entre 14px e 30px
+  applyFontSize();
+  saveUserPreferences();
+}
+
+// ============================
+// UI/UX E EVENT LISTENERS
+// ============================
+
+/**
+ * Exibe notificações temporárias
+ */
+function showNotification(message, type = 'info') {
+  const notification = document.getElementById('notification');
+  if (!notification) return;
+
   notification.textContent = message;
-  document.body.appendChild(notification);
+  notification.className = `notification ${type} show`;
 
-  // Remove após 3 segundos
   setTimeout(() => {
-    if (notification.parentNode) {
-      notification.remove();
-    }
+    notification.classList.remove('show');
   }, 3000);
 }
 
 /**
- * Lida com seleção de texto na página
+ * Inicializa a barra de progresso de leitura
  */
-function handleTextSelection() {
-  const selection = window.getSelection();
-  const text = selection.toString().trim();
-  
-  if (text.length > 0) {
-    selectedText = text;
-    updateSelectedTextDisplay();
-  }
-}
-
-/**
- * Atualiza a exibição do texto selecionado no modal
- */
-function updateSelectedTextDisplay() {
-  const container = document.getElementById('selected-text-container');
-  const textDiv = document.getElementById('selected-text');
-  
-  if (container && textDiv) {
-    if (selectedText) {
-      textDiv.textContent = selectedText;
-      container.style.display = 'block';
-    } else {
-      container.style.display = 'none';
-    }
-  }
-}
-
-/**
- * Alterna entre plataformas
- */
-function switchPlatform(platform) {
-  currentPlatform = platform;
-  
-  // Atualiza botões de plataforma
-  const platformButtons = document.querySelectorAll('.platform-btn');
-  platformButtons.forEach(btn => {
-    const btnPlatform = btn.getAttribute('data-platform');
-    btn.classList.toggle('active', btnPlatform === platform);
-  });
-}
-
-/**
- * Processa pergunta (pré-formulada ou personalizada)
- */
-function processQuestion(question) {
-  openAIPlatform(currentPlatform, question);
-}
-
-/**
- * Cria botões de plataformas de IA
- */
-function createPlatformButtons() {
-  const container = document.querySelector('.platform-buttons');
-  if (!container) return;
-
-  container.innerHTML = '';
-
-  const platforms = [
-    { id: 'chatgpt', name: 'ChatGPT' },
-    { id: 'openevidence', name: 'OpenEvidence' },
-    { id: 'consensus', name: 'Consensus' },
-    { id: 'perplexity', name: 'Perplexity' }
-  ];
-
-  platforms.forEach(platform => {
-    const button = document.createElement('button');
-    button.className = 'platform-btn';
-    button.setAttribute('data-platform', platform.id);
-    button.textContent = platform.name;
-    
-    button.addEventListener('click', () => switchPlatform(platform.id));
-    
-    container.appendChild(button);
-  });
-}
-
-/**
- * Cria botões de perguntas pré-formuladas
- */
-function createPredefinedQuestionButtons() {
-  const container = document.getElementById('questions-container');
-  if (!container) return;
-
-  container.innerHTML = '';
-
-  PREDEFINED_QUESTIONS.forEach((question, index) => {
-    const button = document.createElement('button');
-    button.className = 'question-btn';
-    button.textContent = question.short;
-    button.title = question.detailed;
-    
-    button.addEventListener('click', () => {
-      processQuestion(question.detailed);
-    });
-    
-    container.appendChild(button);
-  });
-}
-
-// ============================
-// FUNCIONALIDADES DE CONTATO E SUGESTÕES
-// ============================
-
-/**
- * Abre email de contato
- */
-function openContactEmail() {
-  const fileName = getCurrentFileName();
-  const subject = `Contato sobre resumo: ${fileName}`;
-  const body = `Olá,\n\nEstou entrando em contato sobre o resumo "${fileName}".\n\n[Digite sua mensagem aqui]\n\nObrigado!`;
-  
-  const mailtoLink = `mailto:${CONFIG.CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.open(mailtoLink);
-}
-
-/**
- * Abre página de sugestão de edição no GitHub
- */
-function openSuggestionPage() {
-  const fileName = getCurrentFileName();
-  const url = `${CONFIG.GITHUB_DISCUSSION_URL}&title=${encodeURIComponent(`Sugestão para: ${fileName}`)}`;
-  window.open(url, '_blank');
-}
-
-// ============================
-// FUNCIONALIDADES DE EXPORTAÇÃO PDF
-// ============================
-
-/**
- * Exporta conteúdo para PDF
- */
-function exportToPDF() {
-  showNotification('Preparando PDF...');
-  
-  // Cria uma nova janela com o conteúdo para impressão
-  const printWindow = window.open('', '_blank');
-  
-  // Obtém o conteúdo principal
-  const title = document.querySelector('h0')?.textContent || 'Resumo Médico';
-  const content = document.body.innerHTML;
-  
-  // Cria HTML para impressão
-  const printHTML = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>${title}</title>
-      <style>
-        body { 
-          font-family: 'Garamond', serif; 
-          font-size: 12pt; 
-          line-height: 1.4; 
-          margin: 20px;
-          color: #000;
-        }
-        .floating-menu, .login-container, #sidebar, #toggle-btn, 
-        #progress-container, .ai-modal, .tools-modal, .notes-sidebar,
-        .checklist-modal, .font-modal, .ai-modal-overlay, 
-        .tools-modal-overlay, .notes-sidebar-overlay,
-        .checklist-modal-overlay, .font-modal-overlay { 
-          display: none !important; 
-        }
-        h0, h1, h2, h3, h4, h5 { 
-          color: #000; 
-          page-break-after: avoid; 
-        }
-        .destaque { 
-          background: #f0f0f0; 
-          border-left: 4px solid #666; 
-          padding: 10px; 
-          margin: 10px 0; 
-          page-break-inside: avoid; 
-        }
-        table { 
-          border-collapse: collapse; 
-          width: 100%; 
-          page-break-inside: avoid; 
-        }
-        th, td { 
-          border: 1px solid #666; 
-          padding: 8px; 
-        }
-        th { 
-          background: #f0f0f0; 
-        }
-        @page { 
-          margin: 2cm; 
-        }
-      </style>
-    </head>
-    <body>
-      ${content}
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccc; font-size: 10pt; color: #666;">
-        <p><strong>Anotações do usuário:</strong></p>
-        ${generateNotesForPDF()}
-      </div>
-    </body>
-    </html>
-  `;
-  
-  printWindow.document.write(printHTML);
-  printWindow.document.close();
-  
-  // Aguarda carregar e abre diálogo de impressão
-  printWindow.onload = function() {
-    setTimeout(() => {
-      printWindow.print();
-      showNotification('PDF gerado! Use Ctrl+P ou Cmd+P para salvar.');
-    }, 500);
-  };
-}
-
-/**
- * Gera HTML das anotações para incluir no PDF
- */
-function generateNotesForPDF() {
-  if (currentNotes.length === 0) {
-    return '<p style="font-style: italic;">Nenhuma anotação encontrada.</p>';
-  }
-  
-  let notesHTML = '<ul>';
-  currentNotes.forEach(note => {
-    const date = new Date(note.created_at).toLocaleDateString('pt-BR');
-    notesHTML += `<li><strong>${date}:</strong> ${note.note}</li>`;
-  });
-  notesHTML += '</ul>';
-  
-  return notesHTML;
-}
-
-// ============================
-// CONTROLE DE MODAIS
-// ============================
-
-/**
- * Abre modal genérico
- */
-function openModal(modalId, overlayId) {
-  const modal = document.getElementById(modalId);
-  const overlay = document.getElementById(overlayId);
-  
-  if (modal && overlay) {
-    modal.style.display = 'block';
-    overlay.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    
-    setTimeout(() => {
-      modal.classList.add('active');
-      overlay.classList.add('active');
-    }, 10);
-  }
-}
-
-/**
- * Fecha modal genérico
- */
-function closeModal(modalId, overlayId) {
-  const modal = document.getElementById(modalId);
-  const overlay = document.getElementById(overlayId);
-  
-  if (modal && overlay) {
-    modal.classList.remove('active');
-    overlay.classList.remove('active');
-    
-    setTimeout(() => {
-      modal.style.display = 'none';
-      overlay.style.display = 'none';
-      document.body.style.overflow = '';
-    }, 300);
-  }
-}
-
-/**
- * Abre sidebar genérica
- */
-function openSidebar(sidebarId, overlayId) {
-  const sidebar = document.getElementById(sidebarId);
-  const overlay = document.getElementById(overlayId);
-  
-  if (sidebar && overlay) {
-    sidebar.classList.add('active');
-    overlay.style.display = 'block';
-    
-    setTimeout(() => {
-      overlay.classList.add('active');
-    }, 10);
-    
-    if (isMobile()) {
-      document.body.style.overflow = 'hidden';
-    }
-  }
-}
-
-/**
- * Fecha sidebar genérica
- */
-function closeSidebar(sidebarId, overlayId) {
-  const sidebar = document.getElementById(sidebarId);
-  const overlay = document.getElementById(overlayId);
-  
-  if (sidebar && overlay) {
-    sidebar.classList.remove('active');
-    overlay.classList.remove('active');
-    
-    setTimeout(() => {
-      overlay.style.display = 'none';
-      document.body.style.overflow = '';
-    }, 300);
-  }
-}
-
-// ============================
-// CACHE BUST DE IMAGENS
-// ============================
-
-/**
- * Aplica cache bust em todas as imagens com ID
- * Previne problemas de cache em imagens externas
- */
-function applyCacheBust() {
-  const images = document.querySelectorAll('img[id]');
-  
-  images.forEach(img => {
-    if (img.src && !img.src.includes('?t=')) {
-      const separator = img.src.includes('?') ? '&' : '?';
-      img.src = img.src + separator + 't=' + new Date().getTime();
-      console.log('Cache bust aplicado à imagem:', img.id);
-    }
-  });
-}
-
-// Executa após carregar a página
-window.addEventListener('load', applyCacheBust);
-
-// ============================
-// CRIAÇÃO DINÂMICA DE ELEMENTOS DE INTERFACE
-// ============================
-
-/**
- * Cria a barra de progresso de leitura
- */
-function createProgressBar() {
-  // Verifica se já existe
-  if (document.getElementById('progress-container')) {
-    return;
-  }
-
-  const progressContainer = document.createElement('div');
-  progressContainer.id = 'progress-container';
-  
-  const readingTime = document.createElement('div');
-  readingTime.id = 'reading-time';
-  readingTime.textContent = 'Calculando tempo...';
-  
-  const progressBar = document.createElement('div');
-  progressBar.id = 'progress-bar';
-  progressBar.textContent = '0%';
-  
-  progressContainer.appendChild(readingTime);
-  progressContainer.appendChild(progressBar);
-  
-  document.body.appendChild(progressContainer);
-  addFadeInClass(progressContainer);
-  
-  console.log('Barra de progresso criada dinamicamente');
-}
-
-/**
- * Cria o botão flutuante do sumário
- */
-function createToggleButton() {
-  // Verifica se já existe
-  if (document.getElementById('toggle-btn')) {
-    return;
-  }
-
-  const toggleBtn = document.createElement('button');
-  toggleBtn.id = 'toggle-btn';
-  toggleBtn.setAttribute('aria-label', 'Abrir/Fechar Sumário');
-  toggleBtn.setAttribute('title', 'Sumário');
-  
-  const icon = document.createElement('span');
-  icon.className = 'icon';
-  icon.textContent = '☰';
-  
-  const label = document.createElement('span');
-  label.className = 'label';
-  label.textContent = 'Sumário';
-  
-  toggleBtn.appendChild(icon);
-  toggleBtn.appendChild(label);
-  
-  document.body.appendChild(toggleBtn);
-  addFadeInClass(toggleBtn);
-  
-  console.log('Botão de sumário criado dinamicamente');
-  return toggleBtn;
-}
-
-/**
- * Cria a sidebar do sumário
- */
-function createSidebar() {
-  // Verifica se já existe
-  if (document.getElementById('sidebar')) {
-    return;
-  }
-
-  const sidebar = document.createElement('div');
-  sidebar.id = 'sidebar';
-  sidebar.setAttribute('aria-label', 'Sumário da página');
-  
-  const ul = document.createElement('ul');
-  ul.id = 'lista-sumario';
-  
-  sidebar.appendChild(ul);
-  document.body.appendChild(sidebar);
-  
-  // Cria overlay para mobile
-  createSidebarOverlay();
-  
-  console.log('Sidebar criada dinamicamente');
-  return sidebar;
-}
-
-/**
- * Cria overlay para sidebar em dispositivos móveis
- */
-function createSidebarOverlay() {
-  // Verifica se já existe
-  if (document.getElementById('sidebar-overlay')) {
-    return;
-  }
-
-  const overlay = document.createElement('div');
-  overlay.id = 'sidebar-overlay';
-  overlay.setAttribute('aria-hidden', 'true');
-  
-  document.body.appendChild(overlay);
-  
-  // Adiciona evento para fechar sidebar ao clicar no overlay
-  overlay.addEventListener('click', () => closeSidebar('sidebar', 'sidebar-overlay'));
-  
-  console.log('Overlay da sidebar criado');
-  return overlay;
-}
-
-// ============================
-// GERAÇÃO AUTOMÁTICA DO SUMÁRIO
-// ============================
-
-/**
- * Gera o sumário automaticamente baseado nos cabeçalhos da página
- */
-function generateSummary() {
-  const headers = document.querySelectorAll('h0, h1, h2, h3, h4');
-  const lista = document.getElementById('lista-sumario');
-  
-  if (!lista) {
-    console.warn('Lista do sumário não encontrada');
-    return;
-  }
-
-  // Limpa lista existente
-  lista.innerHTML = '';
-  
-  let summaryCount = 0;
-  
-  headers.forEach((header, index) => {
-    // Pula h0 se for o título principal
-    if (header.tagName === 'H0' && index === 0) {
-      return;
-    }
-    
-    // Cria ID único se não existir
-    if (!header.id) {
-      header.id = `titulo-${index}`;
-    }
-    
-    const li = document.createElement('li');
-    const a = document.createElement('a');
-    
-    a.href = `#${header.id}`;
-    a.textContent = header.textContent.trim();
-    a.setAttribute('title', `Ir para: ${header.textContent.trim()}`);
-    
-    // Aplica indentação baseada no nível do cabeçalho
-    const level = parseInt(header.tagName.charAt(1));
-    if (level >= 1) {
-      li.style.marginLeft = `${(level - 1) * 20}px`;
-    }
-    
-    // Adiciona classe para estilização específica
-    li.className = `summary-level-${level}`;
-    
-    // Evento de clique para scroll suave
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      scrollToElement(header);
-      
-      // Fecha sidebar em mobile após clique
-      if (isMobile()) {
-        closeSidebar('sidebar', 'sidebar-overlay');
-      }
-    });
-    
-    li.appendChild(a);
-    lista.appendChild(li);
-    summaryCount++;
-  });
-  
-  console.log(`Sumário gerado com ${summaryCount} itens`);
-}
-
-/**
- * Scroll suave para elemento
- */
-function scrollToElement(element) {
-  if (element) {
-    const offsetTop = element.offsetTop - 80; // Offset para não ficar colado no topo
-    window.scrollTo({
-      top: offsetTop,
-      behavior: 'smooth'
-    });
-  }
-}
-
-// ============================
-// CONTROLE DA SIDEBAR DO SUMÁRIO
-// ============================
-
-/**
- * Alterna visibilidade da sidebar do sumário
- */
-function toggleSummarySidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
-  
-  if (!sidebar) return;
-  
-  const isActive = sidebar.classList.contains('active');
-  
-  if (isActive) {
-    closeSidebar('sidebar', 'sidebar-overlay');
-  } else {
-    openSidebar('sidebar', 'sidebar-overlay');
-  }
-}
-
-// ============================
-// BARRA DE PROGRESSO DE LEITURA
-// ============================
-
-/**
- * Calcula e atualiza a barra de progresso de leitura
- */
-function updateProgress() {
+function initializeProgressBar() {
+  const contentDiv = document.getElementById('content');
   const progressBar = document.getElementById('progress-bar');
-  const readingTimeEl = document.getElementById('reading-time');
-  
-  if (!progressBar || !readingTimeEl) return;
-  
-  // Calcula progresso do scroll
-  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-  const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-  const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
-  const percent = Math.min(100, Math.round(progress));
-  
-  // Atualiza largura da barra
-  const containerWidth = document.getElementById('progress-container')?.offsetWidth || 0;
-  const readingTimeWidth = readingTimeEl.offsetWidth || 0;
-  const barWidth = (containerWidth - readingTimeWidth) * (percent / 100);
-  
-  progressBar.style.width = `${barWidth}px`;
-  progressBar.textContent = `${percent}%`;
-  
-  // Muda cor quando completo
-  if (percent === 100) {
-    progressBar.classList.add('complete');
-  } else {
-    progressBar.classList.remove('complete');
-  }
-  
-  // Calcula tempo restante
-  updateReadingTime(percent, readingTimeEl);
+  const timeToReadSpan = document.getElementById('time-to-read');
+
+  if (!contentDiv || !progressBar || !timeToReadSpan) return;
+
+  const text = contentDiv.innerText;
+  const wordCount = text.split(/\s+/).filter(word => word.length > 0).length;
+  const timeToRead = Math.ceil(wordCount / CONFIG.WPM);
+  timeToReadSpan.textContent = `${timeToRead}min`;
+
+  const updateProgress = () => {
+    const scrollY = window.scrollY;
+    const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = (scrollY / totalHeight) * 100;
+    progressBar.style.width = `${progress}%
+  `;
+  };
+
+  window.addEventListener('scroll', updateProgress);
+  updateProgress(); // Chamada inicial para definir o progresso ao carregar a página
 }
 
 /**
- * Calcula e atualiza o tempo estimado de leitura
+ * Inicializa o botão flutuante e seus sub-botões
  */
-function updateReadingTime(percent, readingTimeEl) {
-  // Conta palavras do conteúdo principal
-  const bodyText = document.body.innerText || document.body.textContent || '';
-  const words = bodyText.trim().split(/\s+/).length;
-  const totalMinutes = words / CONFIG.WPM;
-  
-  const minutesLeft = Math.max(0, Math.ceil(totalMinutes * (1 - percent / 100)));
-  const hours = Math.floor(minutesLeft / 60);
-  const mins = minutesLeft % 60;
-  
-  let timeText = 'Tempo restante estimado: ⏳ ';
-  
-  if (percent === 100) {
-    timeText = 'Leitura concluída! ✅';
-  } else if (hours > 0) {
-    timeText += `${hours}h ${mins}m`;
-  } else {
-    timeText += `${mins}m`;
-  }
-  
-  readingTimeEl.textContent = timeText;
-}
-
-// ============================
-// EVENTOS E INICIALIZAÇÃO
-// ============================
-
-/**
- * Configura todos os event listeners
- */
-function setupEventListeners() {
-  // Botão de toggle da sidebar do sumário
-  const toggleBtn = document.getElementById('toggle-btn');
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', toggleSummarySidebar);
-    
-    // Suporte a teclado
-    toggleBtn.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        toggleSummarySidebar();
-      }
-    });
-  }
-  
-  // Menu flutuante principal
-  const mainFloatingBtn = document.getElementById('main-floating-btn');
-  const floatingSubmenu = document.getElementById('floating-submenu');
-  
-  if (mainFloatingBtn && floatingSubmenu) {
-    mainFloatingBtn.addEventListener('click', () => {
-      mainFloatingBtn.classList.toggle('active');
-      floatingSubmenu.classList.toggle('active');
-    });
-  }
-  
-  // Botões do submenu flutuante
-  const aiAssistantBtn = document.getElementById('ai-assistant-btn');
-  const contactBtn = document.getElementById('contact-btn');
-  const suggestEditBtn = document.getElementById('suggest-edit-btn');
-  const toolsBtn = document.getElementById('tools-btn');
-  
-  if (aiAssistantBtn) {
-    aiAssistantBtn.addEventListener('click', () => {
-      openModal('ai-modal', 'ai-modal-overlay');
-      closeFloatingMenu();
-    });
-  }
-  
-  if (contactBtn) {
-    contactBtn.addEventListener('click', () => {
-      openContactEmail();
-      closeFloatingMenu();
-    });
-  }
-  
-  if (suggestEditBtn) {
-    suggestEditBtn.addEventListener('click', () => {
-      openSuggestionPage();
-      closeFloatingMenu();
-    });
-  }
-  
-  if (toolsBtn) {
-    toolsBtn.addEventListener('click', () => {
-      openModal('tools-modal', 'tools-modal-overlay');
-      closeFloatingMenu();
-    });
-  }
-  
-  // Botões de login/logout
-  const loginBtn = document.getElementById('login-btn');
-  const logoutBtn = document.getElementById('logout-btn');
-  
-  if (loginBtn) {
-    loginBtn.addEventListener('click', loginWithGitHub);
-  }
-  
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', logout);
-  }
-  
-  // Botões de ferramentas
-  const checklistTool = document.getElementById('checklist-tool');
-  const exportPdfTool = document.getElementById('export-pdf-tool');
-  const themeToggleTool = document.getElementById('theme-toggle-tool');
-  const fontSizeTool = document.getElementById('font-size-tool');
-  const notesTool = document.getElementById('notes-tool');
-  
-  if (checklistTool) {
-    checklistTool.addEventListener('click', () => {
-      openModal('checklist-modal', 'checklist-modal-overlay');
-      closeModal('tools-modal', 'tools-modal-overlay');
-    });
-  }
-  
-  if (exportPdfTool) {
-    exportPdfTool.addEventListener('click', () => {
-      exportToPDF();
-      closeModal('tools-modal', 'tools-modal-overlay');
-    });
-  }
-  
-  if (themeToggleTool) {
-    themeToggleTool.addEventListener('click', () => {
-      toggleTheme();
-      closeModal('tools-modal', 'tools-modal-overlay');
-    });
-  }
-  
-  if (fontSizeTool) {
-    fontSizeTool.addEventListener('click', () => {
-      openModal('font-modal', 'font-modal-overlay');
-      closeModal('tools-modal', 'tools-modal-overlay');
-    });
-  }
-  
-  if (notesTool) {
-    notesTool.addEventListener('click', () => {
-      openSidebar('notes-sidebar', 'notes-sidebar-overlay');
-      closeModal('tools-modal', 'tools-modal-overlay');
-    });
-  }
-  
-  // Controles de fonte
-  const fontSlider = document.getElementById('font-size-slider');
-  const fontDecrease = document.getElementById('font-decrease');
-  const fontIncrease = document.getElementById('font-increase');
-  
-  if (fontSlider) {
-    fontSlider.addEventListener('input', (e) => {
-      changeFontSize(parseInt(e.target.value));
-    });
-  }
-  
-  if (fontDecrease) {
-    fontDecrease.addEventListener('click', () => {
-      changeFontSize(currentFontSize - 1);
-    });
-  }
-  
-  if (fontIncrease) {
-    fontIncrease.addEventListener('click', () => {
-      changeFontSize(currentFontSize + 1);
-    });
-  }
-  
-  // Controles de anotações
-  const addNoteBtn = document.getElementById('add-note-btn');
+function initializeFloatingButton() {
+  const floatingButton = document.getElementById('floating-button');
+  const subButtons = document.getElementById('sub-buttons');
+  const iaButton = document.getElementById('ia-button');
+  const suggestEditButton = document.getElementById('suggest-edit-button');
+  const contactButton = document.getElementById('contact-button');
+  const toolsButton = document.getElementById('tools-button');
+  const notesSidebar = document.getElementById('notes-sidebar');
+  const iaAssistantModal = document.getElementById('ia-assistant-modal');
+  const iaAssistantCloseBtn = document.getElementById('ia-assistant-close-btn');
+  const iaAssistantPlatformSelect = document.getElementById('ia-assistant-platform-select');
+  const iaAssistantQuestionInput = document.getElementById('ia-assistant-question-input');
+  const iaAssistantSendBtn = document.getElementById('ia-assistant-send-btn');
+  const iaAssistantPredefinedQuestions = document.getElementById('ia-assistant-predefined-questions');
+  const notesSidebarCloseBtn = document.getElementById('notes-sidebar-close-btn');
   const notesSearchInput = document.getElementById('notes-search-input');
-  
-  if (addNoteBtn) {
-    addNoteBtn.addEventListener('click', addNewNote);
-  }
-  
-  if (notesSearchInput) {
-    notesSearchInput.addEventListener('input', (e) => {
-      filterNotes(e.target.value);
-    });
-  }
-  
-  // Botões de fechar modais
-  setupModalCloseButtons();
-  
-  // Eventos de scroll com throttle
-  const throttledUpdateProgress = throttle(updateProgress, CONFIG.SCROLL_THROTTLE);
-  window.addEventListener('scroll', throttledUpdateProgress);
-  
-  // Eventos de redimensionamento
-  window.addEventListener('resize', () => {
-    updateProgress();
-    
-    // Fecha sidebar em desktop se estiver aberta
-    if (!isMobile()) {
-      const overlay = document.getElementById('sidebar-overlay');
-      if (overlay && overlay.classList.contains('active')) {
-        closeSidebar('sidebar', 'sidebar-overlay');
-      }
+  const exportPdfButton = document.getElementById('export-pdf-button');
+  const checklistButton = document.getElementById('checklist-button');
+  const checklistModal = document.getElementById('checklist-modal');
+  const checklistCloseBtn = document.getElementById('checklist-close-btn');
+
+  let subButtonsVisible = false;
+
+  // Evento de clique no botão flutuante principal
+  floatingButton.addEventListener('click', () => {
+    subButtonsVisible = !subButtonsVisible;
+    if (subButtonsVisible) {
+      subButtons.classList.add('visible');
+    } else {
+      subButtons.classList.remove('visible');
     }
   });
-  
-  // Tecla ESC para fechar modais e sidebars
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeAllModalsAndSidebars();
+
+  // Evento de clique no botão IA
+  iaButton.addEventListener('click', () => {
+    iaAssistantModal.classList.add('visible');
+    // Preenche as plataformas de IA
+    iaAssistantPlatformSelect.innerHTML = '';
+    for (const platform in AI_PLATFORMS) {
+      const btn = document.createElement('button');
+      btn.textContent = platform.charAt(0).toUpperCase() + platform.slice(1);
+      btn.setAttribute('data-platform', platform);
+      btn.addEventListener('click', () => {
+        currentPlatform = platform;
+        // Remove a classe 'active' de todos os botões
+        Array.from(iaAssistantPlatformSelect.children).forEach(b => b.classList.remove('active'));
+        // Adiciona a classe 'active' ao botão clicado
+        btn.classList.add('active');
+      });
+      iaAssistantPlatformSelect.appendChild(btn);
+    }
+    // Seleciona a primeira plataforma por padrão
+    if (iaAssistantPlatformSelect.children.length > 0) {
+      iaAssistantPlatformSelect.children[0].classList.add('active');
+      currentPlatform = iaAssistantPlatformSelect.children[0].getAttribute('data-platform');
+    }
+
+    // Preenche as perguntas pré-formuladas
+    iaAssistantPredefinedQuestions.innerHTML = '';
+    PREDEFINED_QUESTIONS.forEach(q => {
+      const btn = document.createElement('button');
+      btn.textContent = q.short;
+      btn.title = q.detailed; // Tooltip com a versão detalhada
+      btn.addEventListener('click', () => {
+        iaAssistantQuestionInput.value = q.detailed;
+      });
+      iaAssistantPredefinedQuestions.appendChild(btn);
+    });
+  });
+
+  // Evento de clique no botão fechar do assistente IA
+  iaAssistantCloseBtn.addEventListener('click', () => {
+    iaAssistantModal.classList.remove('visible');
+  });
+
+  // Evento de clique no botão enviar pergunta do assistente IA
+  iaAssistantSendBtn.addEventListener('click', () => {
+    const question = iaAssistantQuestionInput.value.trim();
+    if (question) {
+      const platformUrl = AI_PLATFORMS[currentPlatform];
+      if (platformUrl) {
+        const fullUrl = `${platformUrl}?q=${encodeURIComponent(question)}`;
+        window.open(fullUrl, '_blank');
+        showNotification(`Abrindo ${currentPlatform} com sua pergunta!`);
+      } else {
+        showNotification('Plataforma de IA não reconhecida.');
+      }
+    } else {
+      showNotification('Por favor, digite sua pergunta.');
     }
   });
-  
-  // Seleção de texto na página
-  document.addEventListener('mouseup', handleTextSelection);
-  document.addEventListener('keyup', handleTextSelection);
-  
-  console.log('Event listeners configurados');
+
+  // Evento de clique no botão Sugerir edição
+  suggestEditButton.addEventListener('click', () => {
+    window.open(CONFIG.GITHUB_DISCUSSION_URL, '_blank');
+  });
+
+  // Evento de clique no botão Entre em contato
+  contactButton.addEventListener('click', () => {
+    const subject = encodeURIComponent('Contato sobre o resumo: ' + document.title);
+    const body = encodeURIComponent(
+      'Olá, \n\nEstou entrando em contato sobre o resumo: ' + document.title + 
+      '\nURL: ' + window.location.href + 
+      '\n\n[Descreva sua mensagem aqui]\n\nAtenciosamente,\n[Seu Nome]' 
+    );
+    window.location.href = `mailto:${CONFIG.CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+  });
+
+  // Evento de clique no botão Ferramentas (abre a sidebar de anotações)
+  toolsButton.addEventListener('click', () => {
+    notesSidebar.classList.add('visible');
+    loadUserNotes(); // Carrega as anotações ao abrir a sidebar
+  });
+
+  // Evento de clique no botão fechar da sidebar de anotações
+  notesSidebarCloseBtn.addEventListener('click', () => {
+    notesSidebar.classList.remove('visible');
+  });
+
+  // Evento de busca de anotações
+  notesSearchInput.addEventListener('input', (e) => {
+    filterNotes(e.target.value);
+  });
+
+  // Evento de clique no botão Exportar PDF
+  exportPdfButton.addEventListener('click', exportToPdf);
+
+  // Evento de clique no botão Checklist
+  checklistButton.addEventListener('click', () => {
+    checklistModal.classList.add('visible');
+    updateChecklistUI();
+  });
+
+  // Evento de clique no botão fechar do checklist
+  checklistCloseBtn.addEventListener('click', () => {
+    checklistModal.classList.remove('visible');
+  });
 }
 
 /**
- * Configura botões de fechar modais
+ * Inicializa os controles de tema e fonte
  */
-function setupModalCloseButtons() {
-  // Modal do assistente IA
-  const aiModalClose = document.getElementById('ai-modal-close');
-  const aiModalOverlay = document.getElementById('ai-modal-overlay');
-  
-  if (aiModalClose) {
-    aiModalClose.addEventListener('click', () => closeModal('ai-modal', 'ai-modal-overlay'));
+function initializeThemeAndFontControls() {
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
+  const fontSmallBtn = document.getElementById('font-small-btn');
+  const fontMediumBtn = document.getElementById('font-medium-btn');
+  const fontLargeBtn = document.getElementById('font-large-btn');
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', toggleTheme);
   }
-  
-  if (aiModalOverlay) {
-    aiModalOverlay.addEventListener('click', () => closeModal('ai-modal', 'ai-modal-overlay'));
+  if (fontSmallBtn) {
+    fontSmallBtn.addEventListener('click', () => adjustFontSize(-2));
   }
-  
-  // Modal de ferramentas
-  const toolsModalClose = document.getElementById('tools-modal-close');
-  const toolsModalOverlay = document.getElementById('tools-modal-overlay');
-  
-  if (toolsModalClose) {
-    toolsModalClose.addEventListener('click', () => closeModal('tools-modal', 'tools-modal-overlay'));
+  if (fontMediumBtn) {
+    fontMediumBtn.addEventListener('click', () => adjustFontSize(0)); // Volta ao tamanho padrão
   }
-  
-  if (toolsModalOverlay) {
-    toolsModalOverlay.addEventListener('click', () => closeModal('tools-modal', 'tools-modal-overlay'));
+  if (fontLargeBtn) {
+    fontLargeBtn.addEventListener('click', () => adjustFontSize(2));
   }
-  
-  // Modal de checklist
-  const checklistModalClose = document.getElementById('checklist-modal-close');
-  const checklistModalOverlay = document.getElementById('checklist-modal-overlay');
-  
-  if (checklistModalClose) {
-    checklistModalClose.addEventListener('click', () => closeModal('checklist-modal', 'checklist-modal-overlay'));
-  }
-  
-  if (checklistModalOverlay) {
-    checklistModalOverlay.addEventListener('click', () => closeModal('checklist-modal', 'checklist-modal-overlay'));
-  }
-  
-  // Modal de fonte
-  const fontModalClose = document.getElementById('font-modal-close');
-  const fontModalOverlay = document.getElementById('font-modal-overlay');
-  
-  if (fontModalClose) {
-    fontModalClose.addEventListener('click', () => closeModal('font-modal', 'font-modal-overlay'));
-  }
-  
-  if (fontModalOverlay) {
-    fontModalOverlay.addEventListener('click', () => closeModal('font-modal', 'font-modal-overlay'));
-  }
-  
-  // Sidebar de anotações
-  const notesSidebarClose = document.getElementById('notes-sidebar-close');
-  const notesSidebarOverlay = document.getElementById('notes-sidebar-overlay');
-  
-  if (notesSidebarClose) {
-    notesSidebarClose.addEventListener('click', () => closeSidebar('notes-sidebar', 'notes-sidebar-overlay'));
-  }
-  
-  if (notesSidebarOverlay) {
-    notesSidebarOverlay.addEventListener('click', () => closeSidebar('notes-sidebar', 'notes-sidebar-overlay'));
-  }
-  
-  // Botão de enviar pergunta personalizada
-  const sendCustomBtn = document.getElementById('send-custom-btn');
-  if (sendCustomBtn) {
-    sendCustomBtn.addEventListener('click', () => {
-      const customQuestion = document.getElementById('custom-question');
-      if (customQuestion && customQuestion.value.trim()) {
-        processQuestion(customQuestion.value.trim());
-        customQuestion.value = '';
+}
+
+/**
+ * Inicializa o sistema de anotações por seleção de texto
+ */
+function initializeNoteTaking() {
+  const contentDiv = document.getElementById('content');
+  if (!contentDiv) return;
+
+  contentDiv.addEventListener('mouseup', (event) => {
+    const selection = window.getSelection();
+    selectedText = selection.toString().trim();
+
+    if (selectedText.length > 0) {
+      // Cria um modal ou um prompt para a anotação
+      const note = prompt(`Anotar sobre: "${selectedText}"\n\nDigite sua anotação:`);
+      if (note !== null && note.trim() !== '') {
+        saveNote(note, selectedText);
       }
-    });
-  }
-
-  // Enter no textarea para enviar
-  const customQuestion = document.getElementById('custom-question');
-  if (customQuestion) {
-    customQuestion.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        const sendBtn = document.getElementById('send-custom-btn');
-        if (sendBtn) sendBtn.click();
-      }
-    });
-  }
+      selection.removeAllRanges(); // Limpa a seleção
+    }
+  });
 }
 
 /**
- * Fecha menu flutuante
+ * Retorna um ID único para o resumo atual (baseado na URL)
  */
-function closeFloatingMenu() {
-  const mainFloatingBtn = document.getElementById('main-floating-btn');
-  const floatingSubmenu = document.getElementById('floating-submenu');
-  
-  if (mainFloatingBtn) mainFloatingBtn.classList.remove('active');
-  if (floatingSubmenu) floatingSubmenu.classList.remove('active');
-}
-
-/**
- * Fecha todos os modais e sidebars
- */
-function closeAllModalsAndSidebars() {
-  closeModal('ai-modal', 'ai-modal-overlay');
-  closeModal('tools-modal', 'tools-modal-overlay');
-  closeModal('checklist-modal', 'checklist-modal-overlay');
-  closeModal('font-modal', 'font-modal-overlay');
-  closeSidebar('notes-sidebar', 'notes-sidebar-overlay');
-  closeSidebar('sidebar', 'sidebar-overlay');
-  closeFloatingMenu();
-}
-
-/**
- * Alterna tema claro/escuro
- */
-function toggleTheme() {
-  isDarkTheme = !isDarkTheme;
-  applyUserPreferences();
-  saveUserPreferences();
-  showNotification(`Tema ${isDarkTheme ? 'escuro' : 'claro'} ativado!`);
-}
-
-/**
- * Altera tamanho da fonte
- */
-function changeFontSize(newSize) {
-  currentFontSize = Math.max(14, Math.min(28, newSize));
-  applyUserPreferences();
-  saveUserPreferences();
-}
-
-/**
- * Inicialização principal do script
- */
-function initializeApp() {
-  console.log('Inicializando aplicação...');
-  
-  try {
-    // 1. Inicializa Supabase
-    initializeSupabase();
-    
-    // 2. Aplica cache bust nas imagens
-    applyCacheBust();
-    
-    // 3. Cria elementos de interface dinamicamente
-    createProgressBar();
-    createToggleButton();
-    createSidebar();
-    
-    // 4. Gera sumário automaticamente
-    generateSummary();
-    
-    // 5. Configura event listeners
-    setupEventListeners();
-    
-    // 6. Inicializa assistente IA
-    initializeAIAssistant();
-    
-    // 7. Carrega preferências do usuário
-    loadUserPreferences();
-    
-    // 8. Carrega checklist
-    loadUserChecklist();
-    
-    // 9. Atualiza progresso inicial
-    updateProgress();
-    
-    console.log('Aplicação inicializada com sucesso!');
-    
-  } catch (error) {
-    console.error('Erro durante a inicialização:', error);
-  }
-}
-
-/**
- * Inicializa o assistente IA
- */
-function initializeAIAssistant() {
-  console.log('Inicializando assistente IA...');
-  
-  try {
-    // Cria botões de plataformas
-    createPlatformButtons();
-    
-    // Cria botões de perguntas pré-formuladas
-    createPredefinedQuestionButtons();
-    
-    // Define plataforma inicial
-    switchPlatform('chatgpt');
-    
-    console.log('Assistente IA inicializado com sucesso!');
-    
-  } catch (error) {
-    console.error('Erro ao inicializar assistente IA:', error);
-  }
+function getSummaryId() {
+  // Usa o pathname como ID, removendo o .html
+  const path = window.location.pathname;
+  return path.substring(path.lastIndexOf('/') + 1).replace('.html', '');
 }
 
 // ============================
-// INICIALIZAÇÃO AUTOMÁTICA
+// INICIALIZAÇÃO GERAL
 // ============================
 
-// Aguarda o DOM estar pronto
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeApp);
-} else {
-  // DOM já está pronto
-  initializeApp();
-}
-
-/**
- * Função de reinicialização para novos conteúdos
- * Útil quando o conteúdo da página é alterado dinamicamente
- */
-function reinitialize() {
-  console.log('Reinicializando aplicação...');
+document.addEventListener('DOMContentLoaded', () => {
+  initializeSupabase();
+  initializeProgressBar();
+  initializeFloatingButton();
+  initializeThemeAndFontControls();
+  initializeNoteTaking();
   
-  // Regenera sumário
-  generateSummary();
-  
-  // Atualiza progresso
-  updateProgress();
-  
-  // Recarrega checklist
+  // Carrega preferências e checklist na inicialização
+  loadUserPreferences();
   loadUserChecklist();
-  
-  console.log('Aplicação reinicializada');
-}
-
-// Expõe funções globais para uso externo se necessário
-window.MedicalResumeApp = {
-  reinitialize,
-  toggleSummarySidebar,
-  updateProgress,
-  generateSummary,
-  loginWithGitHub,
-  logout,
-  saveNote,
-  exportToPDF,
-  toggleTheme,
-  changeFontSize
-};
-
-console.log('Script do modelo de resumos médicos carregado');
-
+});

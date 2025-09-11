@@ -872,8 +872,10 @@ function sendEditSuggestion() {
   const subject = 'Sugestão de edição - DomusMed';
   let body = `Texto selecionado:\n${selectedText || 'Nenhum texto selecionado'}\n\n`;
   body += `Sugestão de alteração:\n${message}\n\n`;
-  body += `Fonte bibliográfica da alteração sugerida:\n[Preencher aqui]\n\n`;
-  body += `Nome/Contato do usuário:\n[Preencher aqui]\n\n`;
+  body += `Fonte bibliográfica da alteração sugerida:\n[Preencher aqui a referência no formato Vancouver e com print/foto do texto/fonte]\n\n`;
+  body += `Nome do usuário:\n[Preencher aqui seu nome completo]\n\n`;
+  body += `Contato do usuário (celular):\n[(xx) 9 xxxx xxxx]\n\n`;
+  body += `Contato do usuário (e-mail):\n[Preencher aqui]\n\n`;
   body += `Página: ${pageTitle}\nLink: ${pageUrl}`;
   
   const mailtoUrl = `mailto:contato@domusmed.site?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

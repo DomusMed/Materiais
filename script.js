@@ -57,8 +57,8 @@ const PREDEFINED_QUESTIONS = [
     detailed: "Explique este conteúdo médico detalhadamente, como em uma aula de doutorado. Inclua fisiopatologia, epidemiologia, manifestações clínicas, diagnóstico diferencial, exames laboratoriais e de imagem, tratamento, prognóstico e condutas práticas. Faça correlações anatômicas, fisiológicas ou clínicas quando relevante, priorizando informações práticas e objetivas."
   },
   {
-    short: "Crie um caso clínico real baseado neste conteúdo",
-    detailed: "Com base neste conteúdo médico, crie um caso clínico realista, incluindo história clínica, exame físico e resultados laboratoriais/exames de imagem relevantes. Destaque pontos importantes para tomada de decisão, diagnóstico e manejo, de forma educativa, sem fornecer respostas prontas."
+    short: "Crie um caso clínico educativo baseado em evidências",
+    detailed: "Com base nas evidências disponíveis, crie um caso clínico educativo, incluindo história clínica, exame físico, achados laboratoriais e exames de imagem. Destaque pontos de decisão clínica, diagnóstico diferencial e manejo, visando aprendizado prático para residência médica."
   },
   {
     short: "Faça um resumo objetivo do conteúdo para estudo prático",
@@ -89,8 +89,8 @@ const PREDEFINED_QUESTIONS = [
     detailed: "Explique a fisiopatologia desta condição com base nas evidências disponíveis, incluindo mecanismos moleculares, alterações anatômicas e correlações clínicas relevantes, de forma objetiva e prática para aplicação em estudos clínicos ou residência médica."
   },
   {
-    short: "Crie um caso clínico educativo baseado em evidências",
-    detailed: "Com base nas evidências disponíveis, crie um caso clínico educativo, incluindo história clínica, exame físico, achados laboratoriais e exames de imagem. Destaque pontos de decisão clínica, diagnóstico diferencial e manejo, visando aprendizado prático para residência médica."
+    short: "Crie um flashcard cloze deletion deste conceito",
+    detailed: "Com base no texto fornecido, crie um flashcard em formato de frase única afirmativa, no estilo cloze deletion, utilizando a formatação {{c1::termo}}. Oclua apenas o termo chave mais importante do conceito ou definição central do conteúdo, garantindo objetividade e foco prático, adequado para aprendizado médico e revisão rápida."
   }
 ];
 

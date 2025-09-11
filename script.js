@@ -650,6 +650,7 @@ function sendGitHubSuggestion() {
   }
   
   compiledText += `**Sugestão de alteração:**\n${suggestion}\n\n`;
+  compiledText += `**Fonte bibliográfica da alteração sugerida:**\n[Preencher aqui a referência no formato Vancouver e com print/foto do texto/fonte]\n\n`;
   compiledText += `---\n*Sugestão enviada automaticamente via interface DomusMed*`;
   
   // Copia para área de transferência

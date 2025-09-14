@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cirurgia</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: auto;
+      line-height: 1.6;
+    }
+    section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Arquivo único com resumos</h1>
+
+  <section id="disfagica">
+    <h2>Síndrome Disfágica</h2>
+    <div class="conteudo"></div>
+  </section>
+
+  <section id="dispeptica">
+    <h2>Síndrome Dispéptica</h2>
+    <div class="conteudo"></div>
+  </section>
+
+  <script>
+    async function carregarResumo(id, url) {
+      try {
+        const resp = await fetch(url);
+        const html = await resp.text();
+
+        // Extrai apenas o <body> do HTML externo para evitar duplicações
+        const temp = document.createElement("div");
+        temp.innerHTML = html;
+        const bodyContent = temp.querySelector("body") 
+                          ? temp.querySelector("body").innerHTML 
+                          : html;
+
+        document.querySelector(`#${id} .conteudo`).innerHTML = bodyContent;
+      } catch (e) {
+        document.querySelector(`#${id} .conteudo`).innerHTML = 
+          "<p style='color:red'>Erro ao carregar resumo.</p>";
+        console.error(e);
+      }
+    }
+
+    carregarResumo("disfagica", "https://domusmed.github.io/Materiais/resumos/grandes-sindromes/cirurgia/sindrome-disfagica.html");
+    carregarResumo("dispeptica", "https://domusmed.github.io/Materiais/resumos/grandes-sindromes/cirurgia/sindrome-dispeptica.html");
+  </script>
+</body>
+</html>

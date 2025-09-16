@@ -2,19 +2,6 @@
  * ============================
  * SCRIPT PRINCIPAL DO MODELO DE RESUMOS MÉDICOS
  * ============================
- * 
- * Este script contém toda a lógica necessária para:
- * - Criação dinâmica de elementos de interface
- * - Geração automática do sumário
- * - Controle da sidebar retrátil
- * - Barra de progresso de leitura
- * - Cache bust de imagens
- * - Responsividade e acessibilidade
- * - Assistente IA com seleção de texto e integração ChatGPT/OpenEvidence/Consensus/Perplexity
- * - NOVO: Menu flutuante com sub-botões
- * - NOVO: Modais de contato, edição e ferramentas
- * - NOVO: Modo claro/escuro
- * - NOVO: Ajuste de tamanho de fonte
  */
 
 // ============================
@@ -498,7 +485,7 @@ function setupFloatingMenuListeners() {
     });
   }
 
-  // Sub-botão de sugestão de edição
+  // Sub-botão de sugerir edição
   const suggestEditBtn = document.getElementById('suggest-edit-btn');
   if (suggestEditBtn) {
     suggestEditBtn.addEventListener('click', () => {
@@ -507,12 +494,12 @@ function setupFloatingMenuListeners() {
     });
   }
 
-  // Sub-botão do GitHub
+  // Sub-botão de sugerir via GitHub
   const githubBtn = document.getElementById('github-btn');
   if (githubBtn) {
     githubBtn.addEventListener('click', () => {
       closeFloatingMenu();
-      openGitHubModal();
+      openGithubModal();
     });
   }
 
@@ -525,7 +512,7 @@ function setupFloatingMenuListeners() {
     });
   }
 
-  // Sub-botão "Quero fazer parte"
+  // Sub-botão de quero fazer parte
   const joinTeamBtn = document.getElementById('join-team-btn');
   if (joinTeamBtn) {
     joinTeamBtn.addEventListener('click', () => {
@@ -533,32 +520,20 @@ function setupFloatingMenuListeners() {
       openJoinTeamModal();
     });
   }
-
-  // Fechar menu ao clicar fora
-  document.addEventListener('click', (e) => {
-    const floatingMenu = document.getElementById('floating-menu');
-    if (floatingMenu && !floatingMenu.contains(e.target) && isFloatingMenuOpen) {
-      closeFloatingMenu();
-    }
-  });
 }
 
 // ============================
 // NOVAS FUNCIONALIDADES: MODAIS
 // ============================
 
-/**
- * Abre modal de contato
- */
+// Funções para abrir e fechar modais (exemplo para Contact Modal)
 function openContactModal() {
   const modal = document.getElementById('contact-modal');
   const overlay = document.getElementById('modal-overlay');
-  
   if (modal && overlay) {
     modal.style.display = 'block';
     overlay.style.display = 'block';
     document.body.style.overflow = 'hidden';
-    
     setTimeout(() => {
       modal.classList.add('active');
       overlay.classList.add('active');
@@ -566,18 +541,43 @@ function openContactModal() {
   }
 }
 
-/**
- * Abre modal de edição
- */
+function closeContactModal() {
+  const modal = document.getElementById('contact-modal');
+  const overlay = document.getElementById('modal-overlay');
+  if (modal && overlay) {
+    modal.classList.remove('active');
+    overlay.classList.remove('active');
+    setTimeout(() => {
+      modal.style.display = 'none';
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }, 300);
+  }
+}
+
+function setupContactModalListeners() {
+  const closeBtn = document.getElementById('contact-modal-close');
+  if (closeBtn) closeBtn.addEventListener('click', closeContactModal);
+  const sendBtn = document.getElementById('send-contact-btn');
+  if (sendBtn) {
+    sendBtn.addEventListener('click', () => {
+      const message = document.getElementById('contact-message').value;
+      if (message) {
+        window.location.href = `mailto:seuemail@example.com?subject=Contato DomusMed&body=${encodeURIComponent(message)}`;
+        closeContactModal();
+      }
+    });
+  }
+}
+
+// Funções para o Modal de Edição
 function openEditModal() {
   const modal = document.getElementById('edit-modal');
   const overlay = document.getElementById('modal-overlay');
-  
   if (modal && overlay) {
     modal.style.display = 'block';
     overlay.style.display = 'block';
     document.body.style.overflow = 'hidden';
-    
     setTimeout(() => {
       modal.classList.add('active');
       overlay.classList.add('active');
@@ -585,21 +585,44 @@ function openEditModal() {
   }
 }
 
-/**
- * Abre modal de sugestão via GitHub
- */
-function openGitHubModal() {
+function closeEditModal() {
+  const modal = document.getElementById('edit-modal');
+  const overlay = document.getElementById('modal-overlay');
+  if (modal && overlay) {
+    modal.classList.remove('active');
+    overlay.classList.remove('active');
+    setTimeout(() => {
+      modal.style.display = 'none';
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }, 300);
+  }
+}
+
+function setupEditModalListeners() {
+  const closeBtn = document.getElementById('edit-modal-close');
+  if (closeBtn) closeBtn.addEventListener('click', closeEditModal);
+  const sendBtn = document.getElementById('send-edit-btn');
+  if (sendBtn) {
+    sendBtn.addEventListener('click', () => {
+      const message = document.getElementById('edit-message').value;
+      if (message) {
+        window.location.href = `mailto:seuemail@example.com?subject=Sugestão de Edição DomusMed&body=${encodeURIComponent(message)}`;
+        closeEditModal();
+      }
+    });
+  }
+}
+
+// Funções para o Modal do GitHub
+function openGithubModal() {
   const modal = document.getElementById('github-modal');
   const overlay = document.getElementById('modal-overlay');
-  
   if (modal && overlay) {
-    // Atualiza texto selecionado no modal do GitHub
-    updateGitHubSelectedTextDisplay();
-    
     modal.style.display = 'block';
     overlay.style.display = 'block';
     document.body.style.overflow = 'hidden';
-    
+    updateGithubSelectedTextDisplay();
     setTimeout(() => {
       modal.classList.add('active');
       overlay.classList.add('active');
@@ -607,13 +630,23 @@ function openGitHubModal() {
   }
 }
 
-/**
- * Atualiza a exibição do texto selecionado no modal do GitHub
- */
-function updateGitHubSelectedTextDisplay() {
+function closeGithubModal() {
+  const modal = document.getElementById('github-modal');
+  const overlay = document.getElementById('modal-overlay');
+  if (modal && overlay) {
+    modal.classList.remove('active');
+    overlay.classList.remove('active');
+    setTimeout(() => {
+      modal.style.display = 'none';
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }, 300);
+  }
+}
+
+function updateGithubSelectedTextDisplay() {
   const container = document.getElementById('github-selected-text-container');
   const textDiv = document.getElementById('github-selected-text');
-  
   if (container && textDiv) {
     if (selectedText) {
       textDiv.textContent = selectedText;
@@ -624,167 +657,33 @@ function updateGitHubSelectedTextDisplay() {
   }
 }
 
-/**
- * Envia sugestão para GitHub Discussion
- */
-function sendGitHubSuggestion() {
-  const suggestionTextarea = document.getElementById('github-suggestion');
-  if (!suggestionTextarea) return;
-  
-  const suggestion = suggestionTextarea.value.trim();
-  if (!suggestion) {
-    showNotification('Por favor, digite sua sugestão.');
-    return;
-  }
-  
-  const pageTitle = document.title || 'Página sem título';
-  const pageUrl = window.location.href;
-  
-  // Compila as informações
-  let compiledText = `**Sugestão de Edição**\n\n`;
-  compiledText += `**Arquivo:** ${pageTitle}\n`;
-  compiledText += `**Link:** ${pageUrl}\n\n`;
-  
-  if (selectedText) {
-    compiledText += `**Texto selecionado:**\n\`\`\`\n${selectedText}\n\`\`\`\n\n`;
-  }
-  
-  compiledText += `**Sugestão de alteração:**\n${suggestion}\n\n`;
-  compiledText += `**Fonte bibliográfica da alteração sugerida:**\n[Preencher aqui a referência no formato Vancouver e com print/foto do texto/fonte]\n\n`;
-  compiledText += `---\n*Sugestão enviada automaticamente via interface DomusMed*`;
-  
-  // Copia para área de transferência
-  copyToClipboard(compiledText);
-  
-  // Abre GitHub Discussion
-  const githubUrl = 'https://github.com/DomusMed/Materiais/discussions/1';
-  window.open(githubUrl, '_blank');
-  
-  suggestionTextarea.value = '';
-  closeAllModals();
-  showNotification('Informações copiadas! Cole no GitHub Discussion.');
-}
-
-/**
- * Abre modal "Quero fazer parte"
- */
-function openJoinTeamModal() {
-  const modal = document.getElementById('join-team-modal');
-  const overlay = document.getElementById('modal-overlay');
-  
-  if (modal && overlay) {
-    modal.style.display = 'block';
-    overlay.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    
-    setTimeout(() => {
-      modal.classList.add('active');
-      overlay.classList.add('active');
-    }, 10);
-  }
-}
-
-/**
- * Controla a exibição do campo de semestre baseado no status acadêmico
- */
-function handleStatusChange() {
-  const statusSelect = document.getElementById('join-status');
-  const semesterGroup = document.getElementById('semester-group');
-  
-  if (statusSelect && semesterGroup) {
-    const isStudent = statusSelect.value === 'estudante';
-    semesterGroup.style.display = isStudent ? 'block' : 'none';
-    
-    // Limpa o valor do semestre se não for estudante
-    if (!isStudent) {
-      const semesterSelect = document.getElementById('join-semester');
-      if (semesterSelect) {
-        semesterSelect.value = '';
+function setupGithubModalListeners() {
+  const closeBtn = document.getElementById('github-modal-close');
+  if (closeBtn) closeBtn.addEventListener('click', closeGithubModal);
+  const sendBtn = document.getElementById('send-github-btn');
+  if (sendBtn) {
+    sendBtn.addEventListener('click', () => {
+      const suggestion = document.getElementById('github-suggestion').value;
+      const fullSuggestion = selectedText ? `Texto selecionado: ${selectedText}\n\nSugestão: ${suggestion}` : suggestion;
+      if (fullSuggestion) {
+        // Aqui você integraria com a API do GitHub ou abriria um link para criar uma discussão
+        // Por simplicidade, vamos apenas logar e fechar o modal
+        console.log('Sugestão para GitHub:', fullSuggestion);
+        alert('Funcionalidade de envio para GitHub não implementada. Sugestão logada no console.');
+        closeGithubModal();
       }
-    }
+    });
   }
 }
 
-/**
- * Envia formulário "Quero fazer parte"
- */
-function sendJoinTeamForm() {
-  // Coleta os dados do formulário
-  const name = document.getElementById('join-name')?.value.trim() || '';
-  const email = document.getElementById('join-email')?.value.trim() || '';
-  const phone = document.getElementById('join-phone')?.value.trim() || '';
-  const status = document.getElementById('join-status')?.value || '';
-  const semester = document.getElementById('join-semester')?.value || '';
-  const motivation = document.getElementById('join-motivation')?.value.trim() || '';
-  
-  // Validação básica
-  if (!name || !email || !status || !motivation) {
-    showNotification('Por favor, preencha todos os campos obrigatórios.');
-    return;
-  }
-  
-  // Validação de e-mail básica
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    showNotification('Por favor, digite um e-mail válido.');
-    return;
-  }
-  
-  // Monta o corpo do e-mail
-  const subject = 'Quero fazer parte da DomusMed';
-  let body = `Nome completo: ${name}\n\n`;
-  body += `E-mail de contato: ${email}\n\n`;
-  body += `Telefone de contato: ${phone || 'Não informado'}\n\n`;
-  body += `Status acadêmico: ${status === 'estudante' ? 'Estudante de medicina' : 'Médico formado'}\n\n`;
-  
-  if (status === 'estudante' && semester) {
-    body += `Semestre atual: ${semester}º semestre\n\n`;
-  }
-  
-  body += `Motivação para se juntar ao projeto:\n${motivation}\n\n`;
-  body += `---\nFormulário enviado via interface DomusMed`;
-  
-  // Abre cliente de e-mail
-  const mailtoUrl = `mailto:contato@domusmed.site?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailtoUrl;
-  
-  // Limpa o formulário
-  clearJoinTeamForm();
-  closeAllModals();
-  showNotification('Cliente de e-mail aberto!');
-}
-
-/**
- * Limpa o formulário "Quero fazer parte"
- */
-function clearJoinTeamForm() {
-  const fields = ['join-name', 'join-email', 'join-phone', 'join-status', 'join-semester', 'join-motivation'];
-  fields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.value = '';
-    }
-  });
-  
-  // Esconde o campo de semestre
-  const semesterGroup = document.getElementById('semester-group');
-  if (semesterGroup) {
-    semesterGroup.style.display = 'none';
-  }
-}
-
-/**
- * Abre modal de ferramentas
- */
+// Funções para o Modal de Ferramentas
 function openToolsModal() {
   const modal = document.getElementById('tools-modal');
   const overlay = document.getElementById('modal-overlay');
-  
   if (modal && overlay) {
     modal.style.display = 'block';
     overlay.style.display = 'block';
     document.body.style.overflow = 'hidden';
-    
     setTimeout(() => {
       modal.classList.add('active');
       overlay.classList.add('active');
@@ -792,889 +691,213 @@ function openToolsModal() {
   }
 }
 
-/**
- * Fecha todos os modais
- */
-function closeAllModals() {
-  const modals = ['contact-modal', 'edit-modal', 'github-modal', 'join-team-modal', 'tools-modal'];
+function closeToolsModal() {
+  const modal = document.getElementById('tools-modal');
   const overlay = document.getElementById('modal-overlay');
-  
-  modals.forEach(modalId => {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-      modal.classList.remove('active');
-      setTimeout(() => {
-        modal.style.display = 'none';
-      }, 300);
-    }
-  });
-  
-  if (overlay) {
+  if (modal && overlay) {
+    modal.classList.remove('active');
     overlay.classList.remove('active');
     setTimeout(() => {
+      modal.style.display = 'none';
       overlay.style.display = 'none';
       document.body.style.overflow = '';
     }, 300);
   }
 }
 
-/**
- * Abre discussão no GitHub
- */
-function openGitHubDiscussion() {
-  const url = 'https://github.com/DomusMed/Materiais/discussions/1';
-  window.open(url, '_blank');
-  showNotification('Abrindo discussão no GitHub...');
-}
+function setupToolsModalListeners() {
+  const closeBtn = document.getElementById('tools-modal-close');
+  if (closeBtn) closeBtn.addEventListener('click', closeToolsModal);
 
-/**
- * Envia e-mail de contato
- */
-function sendContactEmail() {
-  const messageTextarea = document.getElementById('contact-message');
-  if (!messageTextarea) return;
-  
-  const message = messageTextarea.value.trim();
-  if (!message) {
-    showNotification('Por favor, digite uma mensagem.');
-    return;
+  // Modo Claro/Escuro
+  const lightModeBtn = document.getElementById('light-mode-btn');
+  const darkModeBtn = document.getElementById('dark-mode-btn');
+
+  if (lightModeBtn) {
+    lightModeBtn.addEventListener('click', () => setDarkMode(false));
   }
-  
-  const pageTitle = document.title || 'Página sem título';
-  const pageUrl = window.location.href;
-  
-  const subject = 'DomusMed - Contato';
-  const body = `Mensagem: ${message}\n\nPágina: ${pageTitle}\nLink: ${pageUrl}`;
-  
-  const mailtoUrl = `mailto:contato@domusmed.site?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailtoUrl;
-  
-  messageTextarea.value = '';
-  closeAllModals();
-  showNotification('Cliente de e-mail aberto!');
-}
-
-/**
- * Envia sugestão de edição via e-mail
- */
-function sendEditSuggestion() {
-  const messageTextarea = document.getElementById('edit-message');
-  if (!messageTextarea) return;
-  
-  const message = messageTextarea.value.trim();
-  if (!message) {
-    showNotification('Por favor, descreva sua sugestão.');
-    return;
-  }
-  
-  const pageTitle = document.title || 'Página sem título';
-  const pageUrl = window.location.href;
-  
-  const subject = 'Sugestão de edição - DomusMed';
-  let body = `Texto selecionado:\n${selectedText || 'Nenhum texto selecionado'}\n\n`;
-  body += `Sugestão de alteração:\n${message}\n\n`;
-  body += `Fonte bibliográfica da alteração sugerida:\n[Preencher aqui a referência no formato Vancouver e com print/foto do texto/fonte]\n\n`;
-  body += `Nome do usuário:\n[Preencher aqui seu nome completo]\n\n`;
-  body += `Contato do usuário (celular):\n[(xx) 9 xxxx xxxx]\n\n`;
-  body += `Contato do usuário (e-mail):\n[Preencher aqui]\n\n`;
-  body += `Página: ${pageTitle}\nLink: ${pageUrl}`;
-  
-  const mailtoUrl = `mailto:contato@domusmed.site?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailtoUrl;
-  
-  messageTextarea.value = '';
-  closeAllModals();
-  showNotification('Cliente de e-mail aberto!');
-}
-
-/**
- * Configura event listeners dos modais
- */
-function setupModalListeners() {
-  // Botões de fechar modais
-  const closeButtons = document.querySelectorAll('.modal-close');
-  closeButtons.forEach(btn => {
-    btn.addEventListener('click', closeAllModals);
-  });
-
-  // Overlay para fechar modais
-  const overlay = document.getElementById('modal-overlay');
-  if (overlay) {
-    overlay.addEventListener('click', closeAllModals);
+  if (darkModeBtn) {
+    darkModeBtn.addEventListener('click', () => setDarkMode(true));
   }
 
-  // Botão de enviar contato
-  const sendContactBtn = document.getElementById('send-contact-btn');
-  if (sendContactBtn) {
-    sendContactBtn.addEventListener('click', sendContactEmail);
+  // Ajuste de Fonte
+  const fontSizeSlider = document.getElementById('font-size-slider');
+  const fontSizeValue = document.getElementById('font-size-value');
+  const fontPresetButtons = document.querySelectorAll('.font-preset-btn');
+
+  if (fontSizeSlider && fontSizeValue) {
+    fontSizeSlider.addEventListener('input', (e) => {
+      const size = e.target.value;
+      setFontSize(size);
+    });
   }
 
-  // Botão de enviar edição
-  const sendEditBtn = document.getElementById('send-edit-btn');
-  if (sendEditBtn) {
-    sendEditBtn.addEventListener('click', sendEditSuggestion);
-  }
-
-  // Botão de enviar edição via GitHub
-  const sendGitHubBtn = document.getElementById('send-github-btn');
-  if (sendGitHubBtn) {
-    sendGitHubBtn.addEventListener('click', sendGitHubSuggestion);
-  }
-
-  // Botão de fechar modal do GitHub
-  const githubModalClose = document.getElementById('github-modal-close');
-  if (githubModalClose) {
-    githubModalClose.addEventListener('click', closeAllModals);
-  }
-
-  // Botão de enviar formulário "Quero fazer parte"
-  const sendJoinTeamBtn = document.getElementById('send-join-team-btn');
-  if (sendJoinTeamBtn) {
-    sendJoinTeamBtn.addEventListener('click', sendJoinTeamForm);
-  }
-
-  // Botão de fechar modal "Quero fazer parte"
-  const joinTeamModalClose = document.getElementById('join-team-modal-close');
-  if (joinTeamModalClose) {
-    joinTeamModalClose.addEventListener('click', closeAllModals);
-  }
-
-  // Event listener para mudança de status acadêmico
-  const statusSelect = document.getElementById('join-status');
-  if (statusSelect) {
-    statusSelect.addEventListener('change', handleStatusChange);
-  }
-
-  // ESC para fechar modais
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      const activeModal = document.querySelector('.contact-modal.active, .edit-modal.active, .github-modal.active, .join-team-modal.active, .tools-modal.active');
-      if (activeModal) {
-        closeAllModals();
-      }
-    }
+  fontPresetButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const size = parseInt(btn.dataset.size);
+      setFontSize(size);
+    });
   });
 }
 
-// ============================
-// NOVAS FUNCIONALIDADES: MODO ESCURO
-// ============================
-
-/**
- * Alterna modo escuro
- */
-function toggleDarkMode() {
-  isDarkMode = !isDarkMode;
-  document.body.classList.toggle('dark-mode', isDarkMode);
-  
-  // Atualiza botões de tema
+function setDarkMode(enable) {
+  isDarkMode = enable;
+  document.body.classList.toggle('dark-mode', enable);
+  localStorage.setItem('darkMode', enable);
   updateThemeButtons();
-  
-  // Salva preferência
-  localStorage.setItem('darkMode', isDarkMode);
-  
-  showNotification(`Modo ${isDarkMode ? 'escuro' : 'claro'} ativado!`);
 }
 
-/**
- * Ativa modo claro
- */
-function setLightMode() {
-  isDarkMode = false;
-  document.body.classList.remove('dark-mode');
-  updateThemeButtons();
-  localStorage.setItem('darkMode', false);
-  showNotification('Modo claro ativado!');
+function initializeTheme() {
+  const savedMode = localStorage.getItem('darkMode');
+  if (savedMode === 'true') {
+    setDarkMode(true);
+  } else {
+    setDarkMode(false);
+  }
 }
 
-/**
- * Ativa modo escuro
- */
-function setDarkMode() {
-  isDarkMode = true;
-  document.body.classList.add('dark-mode');
-  updateThemeButtons();
-  localStorage.setItem('darkMode', true);
-  showNotification('Modo escuro ativado!');
-}
-
-/**
- * Atualiza botões de tema
- */
 function updateThemeButtons() {
-  const lightBtn = document.getElementById('light-mode-btn');
-  const darkBtn = document.getElementById('dark-mode-btn');
-  
-  if (lightBtn && darkBtn) {
-    lightBtn.classList.toggle('active', !isDarkMode);
-    darkBtn.classList.toggle('active', isDarkMode);
+  const lightModeBtn = document.getElementById('light-mode-btn');
+  const darkModeBtn = document.getElementById('dark-mode-btn');
+  if (lightModeBtn && darkModeBtn) {
+    lightModeBtn.classList.toggle('active', !isDarkMode);
+    darkModeBtn.classList.toggle('active', isDarkMode);
   }
 }
 
-/**
- * Carrega preferência de tema salva
- */
-function loadThemePreference() {
-  const savedTheme = localStorage.getItem('darkMode');
-  if (savedTheme !== null) {
-    isDarkMode = savedTheme === 'true';
-    document.body.classList.toggle('dark-mode', isDarkMode);
-    updateThemeButtons();
-  }
-}
-
-// ============================
-// NOVAS FUNCIONALIDADES: AJUSTE DE FONTE
-// ============================
-
-/**
- * Atualiza tamanho da fonte
- */
-function updateFontSize(size) {
+function setFontSize(size) {
   currentFontSize = size;
   document.body.style.fontSize = `${size}px`;
-  
-  // Atualiza valor exibido
   const fontSizeValue = document.getElementById('font-size-value');
-  if (fontSizeValue) {
-    fontSizeValue.textContent = size;
-  }
-  
-  // Atualiza slider
-  const slider = document.getElementById('font-size-slider');
-  if (slider) {
-    slider.value = size;
-  }
-  
-  // Atualiza botões de preset
-  updateFontPresetButtons();
-  
-  // Salva preferência
+  if (fontSizeValue) fontSizeValue.textContent = size;
   localStorage.setItem('fontSize', size);
-  
-  showNotification(`Tamanho da fonte: ${size}px`);
+  updateFontSizeButtons();
 }
 
-/**
- * Atualiza botões de preset de fonte
- */
-function updateFontPresetButtons() {
-  const presetButtons = document.querySelectorAll('.font-preset-btn');
-  presetButtons.forEach(btn => {
-    const btnSize = parseInt(btn.getAttribute('data-size'));
-    btn.classList.toggle('active', btnSize === currentFontSize);
-  });
-}
-
-/**
- * Carrega preferência de fonte salva
- */
-function loadFontPreference() {
+function initializeFontSize() {
   const savedSize = localStorage.getItem('fontSize');
   if (savedSize) {
-    currentFontSize = parseInt(savedSize);
-    updateFontSize(currentFontSize);
-  }
-}
-
-/**
- * Configura event listeners das ferramentas
- */
-function setupToolsListeners() {
-  // Botões de tema
-  const lightBtn = document.getElementById('light-mode-btn');
-  const darkBtn = document.getElementById('dark-mode-btn');
-  
-  if (lightBtn) {
-    lightBtn.addEventListener('click', setLightMode);
-  }
-  
-  if (darkBtn) {
-    darkBtn.addEventListener('click', setDarkMode);
-  }
-
-  // Slider de fonte
-  const fontSlider = document.getElementById('font-size-slider');
-  if (fontSlider) {
-    fontSlider.addEventListener('input', (e) => {
-      updateFontSize(parseInt(e.target.value));
-    });
-  }
-
-  // Botões de preset de fonte
-  const presetButtons = document.querySelectorAll('.font-preset-btn');
-  presetButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const size = parseInt(btn.getAttribute('data-size'));
-      updateFontSize(size);
-    });
-  });
-}
-
-// ============================
-// CACHE BUST DE IMAGENS
-// ============================
-
-/**
- * Aplica cache bust em todas as imagens com ID
- * Previne problemas de cache em imagens externas
- */
-function applyCacheBust() {
-  const images = document.querySelectorAll('img[id]');
-  
-  images.forEach(img => {
-    if (img.src && !img.src.includes('?t=')) {
-      const separator = img.src.includes('?') ? '&' : '?';
-      img.src = img.src + separator + 't=' + new Date().getTime();
-      console.log('Cache bust aplicado à imagem:', img.id);
-    }
-  });
-}
-
-// Executa após carregar a página
-window.addEventListener('load', applyCacheBust);
-
-// ============================
-// CRIAÇÃO DINÂMICA DE ELEMENTOS DE INTERFACE
-// ============================
-
-/**
- * Cria a barra de progresso de leitura
- */
-function createProgressBar() {
-  // Verifica se já existe
-  if (document.getElementById('progress-container')) {
-    return;
-  }
-
-  const progressContainer = document.createElement('div');
-  progressContainer.id = 'progress-container';
-  
-  const readingTime = document.createElement('div');
-  readingTime.id = 'reading-time';
-  readingTime.textContent = 'Calculando tempo...';
-  
-  const progressBar = document.createElement('div');
-  progressBar.id = 'progress-bar';
-  progressBar.textContent = '0%';
-  
-  progressContainer.appendChild(readingTime);
-  progressContainer.appendChild(progressBar);
-  
-  document.body.appendChild(progressContainer);
-  addFadeInClass(progressContainer);
-  
-  console.log('Barra de progresso criada dinamicamente');
-}
-
-/**
- * Cria o botão flutuante do sumário
- */
-function createToggleButton() {
-  // Verifica se já existe
-  if (document.getElementById('toggle-btn')) {
-    return;
-  }
-
-  const toggleBtn = document.createElement('button');
-  toggleBtn.id = 'toggle-btn';
-  toggleBtn.setAttribute('aria-label', 'Abrir/Fechar Sumário');
-  toggleBtn.setAttribute('title', 'Sumário');
-  
-  const icon = document.createElement('span');
-  icon.className = 'icon';
-  icon.textContent = '☰';
-  
-  const label = document.createElement('span');
-  label.className = 'label';
-  label.textContent = 'Sumário';
-  
-  toggleBtn.appendChild(icon);
-  toggleBtn.appendChild(label);
-  
-  document.body.appendChild(toggleBtn);
-  addFadeInClass(toggleBtn);
-  
-  console.log('Botão de sumário criado dinamicamente');
-  return toggleBtn;
-}
-
-/**
- * Cria a sidebar do sumário
- */
-function createSidebar() {
-  // Verifica se já existe
-  if (document.getElementById('sidebar')) {
-    return;
-  }
-
-  const sidebar = document.createElement('div');
-  sidebar.id = 'sidebar';
-  sidebar.setAttribute('aria-label', 'Sumário da página');
-  
-  const ul = document.createElement('ul');
-  ul.id = 'lista-sumario';
-  
-  sidebar.appendChild(ul);
-  document.body.appendChild(sidebar);
-  
-  // Cria overlay para mobile
-  createSidebarOverlay();
-  
-  console.log('Sidebar criada dinamicamente');
-  return sidebar;
-}
-
-/**
- * Cria overlay para sidebar em dispositivos móveis
- */
-function createSidebarOverlay() {
-  // Verifica se já existe
-  if (document.getElementById('sidebar-overlay')) {
-    return;
-  }
-
-  const overlay = document.createElement('div');
-  overlay.id = 'sidebar-overlay';
-  overlay.setAttribute('aria-hidden', 'true');
-  
-  document.body.appendChild(overlay);
-  
-  // Adiciona evento para fechar sidebar ao clicar no overlay
-  overlay.addEventListener('click', closeSidebar);
-  
-  console.log('Overlay da sidebar criado');
-  return overlay;
-}
-
-// ============================
-// GERAÇÃO AUTOMÁTICA DO SUMÁRIO
-// ============================
-
-/**
- * Gera o sumário automaticamente baseado nos cabeçalhos da página
- */
-function generateSummary() {
-  const headers = document.querySelectorAll('h0, h1, h2, h3, h4');
-  const lista = document.getElementById('lista-sumario');
-  
-  if (!lista) {
-    console.warn('Lista do sumário não encontrada');
-    return;
-  }
-
-  // Limpa lista existente
-  lista.innerHTML = '';
-  
-  let summaryCount = 0;
-  
-  headers.forEach((header, index) => {
-    // Pula h0 se for o título principal
-    if (header.tagName === 'H0' && index === 0) {
-      return;
-    }
-    
-    // Cria ID único se não existir
-    if (!header.id) {
-      header.id = `titulo-${index}`;
-    }
-    
-    const li = document.createElement('li');
-    const a = document.createElement('a');
-    
-    a.href = `#${header.id}`;
-    a.textContent = header.textContent.trim();
-    a.setAttribute('title', `Ir para: ${header.textContent.trim()}`);
-    
-    // Aplica indentação baseada no nível do cabeçalho
-    const level = parseInt(header.tagName.charAt(1));
-    if (level >= 1) {
-      li.style.marginLeft = `${(level - 1) * 20}px`;
-    }
-    
-    // Adiciona classe para estilização específica
-    li.className = `summary-level-${level}`;
-    
-    // Evento de clique para scroll suave
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      scrollToElement(header);
-      
-      // Fecha sidebar em mobile após clique
-      if (isMobile()) {
-        closeSidebar();
-      }
-    });
-    
-    li.appendChild(a);
-    lista.appendChild(li);
-    summaryCount++;
-  });
-  
-  console.log(`Sumário gerado com ${summaryCount} itens`);
-}
-
-/**
- * Scroll suave para elemento
- */
-function scrollToElement(element) {
-  if (element) {
-    const offsetTop = element.offsetTop - 80; // Offset para não ficar colado no topo
-    window.scrollTo({
-      top: offsetTop,
-      behavior: 'smooth'
-    });
-  }
-}
-
-// ============================
-// CONTROLE DA SIDEBAR
-// ============================
-
-/**
- * Alterna visibilidade da sidebar
- */
-function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
-  
-  if (!sidebar) return;
-  
-  const isActive = sidebar.classList.contains('active');
-  
-  if (isActive) {
-    closeSidebar();
+    setFontSize(parseInt(savedSize));
+    const fontSizeSlider = document.getElementById('font-size-slider');
+    if (fontSizeSlider) fontSizeSlider.value = savedSize;
   } else {
-    openSidebar();
+    setFontSize(currentFontSize); // Define o tamanho padrão se não houver um salvo
   }
 }
 
-/**
- * Abre a sidebar
- */
-function openSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
-  const toggleBtn = document.getElementById('toggle-btn');
-  
-  if (sidebar) {
-    sidebar.classList.add('active');
-    sidebar.setAttribute('aria-hidden', 'false');
-  }
-  
-  if (overlay && isMobile()) {
-    overlay.classList.add('active');
-    overlay.setAttribute('aria-hidden', 'false');
-  }
-  
-  if (toggleBtn) {
-    toggleBtn.setAttribute('aria-expanded', 'true');
-  }
-  
-  // Previne scroll do body em mobile
-  if (isMobile()) {
+function updateFontSizeButtons() {
+  const fontPresetButtons = document.querySelectorAll('.font-preset-btn');
+  fontPresetButtons.forEach(btn => {
+    const size = parseInt(btn.dataset.size);
+    btn.classList.toggle('active', size === currentFontSize);
+  });
+}
+
+// Funções para o Modal "Quero fazer parte"
+function openJoinTeamModal() {
+  const modal = document.getElementById('join-team-modal');
+  const overlay = document.getElementById('modal-overlay');
+  if (modal && overlay) {
+    modal.style.display = 'block';
+    overlay.style.display = 'block';
     document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+      modal.classList.add('active');
+      overlay.classList.add('active');
+    }, 10);
   }
-  
-  console.log('Sidebar aberta');
 }
 
-/**
- * Fecha a sidebar
- */
-function closeSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
-  const toggleBtn = document.getElementById('toggle-btn');
-  
-  if (sidebar) {
-    sidebar.classList.remove('active');
-    sidebar.setAttribute('aria-hidden', 'true');
-  }
-  
-  if (overlay) {
+function closeJoinTeamModal() {
+  const modal = document.getElementById('join-team-modal');
+  const overlay = document.getElementById('modal-overlay');
+  if (modal && overlay) {
+    modal.classList.remove('active');
     overlay.classList.remove('active');
-    overlay.setAttribute('aria-hidden', 'true');
+    setTimeout(() => {
+      modal.style.display = 'none';
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }, 300);
   }
-  
-  if (toggleBtn) {
-    toggleBtn.setAttribute('aria-expanded', 'false');
-  }
-  
-  // Restaura scroll do body
-  document.body.style.overflow = '';
-  
-  console.log('Sidebar fechada');
 }
 
-// ============================
-// BARRA DE PROGRESSO DE LEITURA
-// ============================
+function setupJoinTeamModalListeners() {
+  const closeBtn = document.getElementById('join-team-modal-close');
+  if (closeBtn) closeBtn.addEventListener('click', closeJoinTeamModal);
 
-/**
- * Calcula e atualiza a barra de progresso de leitura
- */
-function updateProgress() {
-  const progressBar = document.getElementById('progress-bar');
-  const readingTimeEl = document.getElementById('reading-time');
-  
-  if (!progressBar || !readingTimeEl) return;
-  
-  // Calcula progresso do scroll
-  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-  const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-  const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
-  const percent = Math.min(100, Math.round(progress));
-  
-  // Atualiza largura da barra
-  const containerWidth = document.getElementById('progress-container')?.offsetWidth || 0;
-  const readingTimeWidth = readingTimeEl.offsetWidth || 0;
-  const barWidth = (containerWidth - readingTimeWidth) * (percent / 100);
-  
-  progressBar.style.width = `${barWidth}px`;
-  progressBar.textContent = `${percent}%`;
-  
-  // Muda cor quando completo
-  if (percent === 100) {
-    progressBar.classList.add('complete');
-  } else {
-    progressBar.classList.remove('complete');
-  }
-  
-  // Calcula tempo restante
-  updateReadingTime(percent, readingTimeEl);
-}
+  const sendBtn = document.getElementById('send-join-team-btn');
+  if (sendBtn) {
+    sendBtn.addEventListener('click', () => {
+      const name = document.getElementById('join-name').value;
+      const email = document.getElementById('join-email').value;
+      const phone = document.getElementById('join-phone').value;
+      const status = document.getElementById('join-status').value;
+      const semester = document.getElementById('join-semester').value;
+      const motivation = document.getElementById('join-motivation').value;
 
-/**
- * Calcula e atualiza o tempo estimado de leitura
- */
-function updateReadingTime(percent, readingTimeEl) {
-  // Conta palavras do conteúdo principal
-  const bodyText = document.body.innerText || document.body.textContent || '';
-  const words = bodyText.trim().split(/\s+/).length;
-  const totalMinutes = words / CONFIG.WPM;
-  
-  const minutesLeft = Math.max(0, Math.ceil(totalMinutes * (1 - percent / 100)));
-  const hours = Math.floor(minutesLeft / 60);
-  const mins = minutesLeft % 60;
-  
-  let timeText = 'Tempo restante estimado: ⏳ ';
-  
-  if (percent === 100) {
-    timeText = 'Leitura concluída! ✅';
-  } else if (hours > 0) {
-    timeText += `${hours}h ${mins}m`;
-  } else {
-    timeText += `${mins}m`;
-  }
-  
-  readingTimeEl.textContent = timeText;
-}
+      if (name && email && status && motivation) {
+        let body = `Nome: ${name}\nEmail: ${email}\nTelefone: ${phone}\nStatus Acadêmico: ${status}`;
+        if (status === 'estudante' && semester) {
+          body += `\nSemestre: ${semester}`;
+        }
+        body += `\nMotivação: ${motivation}`;
 
-// ============================
-// EVENTOS E INICIALIZAÇÃO
-// ============================
-
-/**
- * Configura todos os event listeners
- */
-function setupEventListeners() {
-  // Botão de toggle da sidebar
-  const toggleBtn = document.getElementById('toggle-btn');
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', toggleSidebar);
-    
-    // Suporte a teclado
-    toggleBtn.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        toggleSidebar();
+        window.location.href = `mailto:seuemail@example.com?subject=Quero fazer parte da DomusMed&body=${encodeURIComponent(body)}`;
+        closeJoinTeamModal();
+      } else {
+        alert('Por favor, preencha todos os campos obrigatórios (Nome, E-mail, Status e Motivação).');
       }
     });
   }
-  
-  // Eventos de scroll com throttle
-  const throttledUpdateProgress = throttle(updateProgress, CONFIG.SCROLL_THROTTLE);
-  window.addEventListener('scroll', throttledUpdateProgress);
-  
-  // Eventos de redimensionamento
-  window.addEventListener('resize', () => {
-    updateProgress();
-    
-    // Fecha sidebar em desktop se estiver aberta
-    if (!isMobile()) {
-      const overlay = document.getElementById('sidebar-overlay');
-      if (overlay && overlay.classList.contains('active')) {
-        closeSidebar();
+
+  const joinStatus = document.getElementById('join-status');
+  const semesterGroup = document.getElementById('semester-group');
+  if (joinStatus && semesterGroup) {
+    joinStatus.addEventListener('change', (e) => {
+      if (e.target.value === 'estudante') {
+        semesterGroup.style.display = 'block';
+      } else {
+        semesterGroup.style.display = 'none';
       }
-    }
-  });
-  
-  // Tecla ESC para fechar sidebar
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      const sidebar = document.getElementById('sidebar');
-      if (sidebar && sidebar.classList.contains('active')) {
-        closeSidebar();
-      }
-    }
-  });
-  
-  console.log('Event listeners configurados');
-}
-
-/**
- * Inicialização principal do script
- */
-function initializeApp() {
-  console.log('Inicializando aplicação...');
-  
-  try {
-    // 1. Aplica cache bust nas imagens
-    applyCacheBust();
-    
-    // 2. Cria elementos de interface dinamicamente
-    createProgressBar();
-    createToggleButton();
-    createSidebar();
-    
-    // 3. Gera sumário automaticamente
-    generateSummary();
-    
-    // 4. Configura event listeners
-    setupEventListeners();
-    
-    // 5. Inicializa assistente IA
-    initializeAIAssistant();
-    
-    // 6. NOVO: Inicializa novas funcionalidades
-    initializeNewFeatures();
-    
-    // 7. Atualiza progresso inicial
-    updateProgress();
-    
-    console.log('Aplicação inicializada com sucesso!');
-    
-  } catch (error) {
-    console.error('Erro durante a inicialização:', error);
-  }
-}
-
-/**
- * Inicializa o assistente IA
- */
-function initializeAIAssistant() {
-  console.log('Inicializando assistente IA...');
-  
-  try {
-    // Cria botões de plataformas
-    createPlatformButtons();
-    
-    // Cria botões de perguntas pré-formuladas
-    createPredefinedQuestionButtons();
-    
-    // Configura event listeners do assistente IA
-    setupAIEventListeners();
-    
-    // Define plataforma inicial
-    switchPlatform('chatgpt');
-    
-    console.log('Assistente IA inicializado com sucesso!');
-    
-  } catch (error) {
-    console.error('Erro ao inicializar assistente IA:', error);
-  }
-}
-
-/**
- * NOVA FUNÇÃO: Inicializa as novas funcionalidades
- */
-function initializeNewFeatures() {
-  console.log('Inicializando novas funcionalidades...');
-  
-  try {
-    // Configura event listeners do menu flutuante
-    setupFloatingMenuListeners();
-    
-    // Configura event listeners dos modais
-    setupModalListeners();
-    
-    // Configura event listeners das ferramentas
-    setupToolsListeners();
-    
-    // Carrega preferências salvas
-    loadThemePreference();
-    loadFontPreference();
-    
-    console.log('Novas funcionalidades inicializadas com sucesso!');
-    
-  } catch (error) {
-    console.error('Erro ao inicializar novas funcionalidades:', error);
+    });
   }
 }
 
 // ============================
-// INICIALIZAÇÃO AUTOMÁTICA
+// CARREGAMENTO DE PARCIAIS (MODALS)
 // ============================
 
-// Aguarda o DOM estar pronto
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeApp);
-} else {
-  // DOM já está pronto
-  initializeApp();
-}
-
 /**
- * Função de reinicialização para novos conteúdos
- * Útil quando o conteúdo da página é alterado dinamicamente
+ * Carrega o conteúdo de modals.html para o #partials-container
  */
-function reinitialize() {
-  console.log('Reinicializando aplicação...');
-  
-  // Regenera sumário
-  generateSummary();
-  
-  // Atualiza progresso
-  updateProgress();
-  
-  console.log('Aplicação reinicializada');
-}
-
-// Expõe funções globais para uso externo se necessário
-window.MedicalResumeApp = {
-  reinitialize,
-  toggleSidebar,
-  openSidebar,
-  closeSidebar,
-  updateProgress,
-  generateSummary,
-  toggleDarkMode,
-  updateFontSize,
-  openContactModal,
-  openEditModal,
-  openToolsModal
-};
-
-console.log('Script do modelo de resumos médicos carregado com novas funcionalidades');
-
-// Inclui modals no corpo do html index
-document.addEventListener("DOMContentLoaded", () => {
-  fetch("partials/modals.html")
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById("partials-container").innerHTML = data;
-      initListeners();
-    })
-    .catch(err => console.error("Erro ao carregar partials:", err));
-});
-
-function initListeners() {
-  // Exemplo: fechar modal
-  const modal = document.getElementById("join-team-modal");
-  const closeBtn = document.getElementById("join-team-modal-close");
-
-  if (modal && closeBtn) {
-    closeBtn.addEventListener("click", () => modal.style.display = "none");
+async function loadPartials() {
+  try {
+    const response = await fetch('modals.html');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.text();
+    const partialsContainer = document.getElementById('partials-container');
+    if (partialsContainer) {
+      partialsContainer.innerHTML = data;
+      // Após carregar os parciais, inicializa os listeners do menu flutuante e modais
+      setupFloatingMenuListeners();
+      setupAIEventListeners();
+      createPlatformButtons();
+      createPredefinedQuestionButtons();
+      setupContactModalListeners();
+      setupEditModalListeners();
+      setupGithubModalListeners();
+      setupToolsModalListeners();
+      setupJoinTeamModalListeners();
+      initializeTheme();
+      initializeFontSize();
+    }
+  } catch (error) {
+    console.error('Erro ao carregar os parciais:', error);
   }
 }
+
+// Chama a função para carregar os parciais quando o DOM estiver completamente carregado
+document.addEventListener('DOMContentLoaded', loadPartials);

@@ -1660,22 +1660,21 @@ console.log('Script do modelo de resumos médicos carregado com novas funcionali
 
 // Inclui modals no corpo do html index
 document.addEventListener("DOMContentLoaded", () => {
-  // Carregar os modais/rodapé em todas as páginas
   fetch("partials/modals.html")
-    .then(res => res.text())
-    .then(html => {
-      document.getElementById("partials-container").innerHTML = html;
-      initEventListeners();
-    });
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById("partials-container").innerHTML = data;
+      initListeners();
+    })
+    .catch(err => console.error("Erro ao carregar partials:", err));
 });
 
-function initEventListeners() {
-  const joinModal = document.getElementById("join-team-modal");
-  const openBtn = document.getElementById("join-team-btn");
+function initListeners() {
+  // Exemplo: fechar modal
+  const modal = document.getElementById("join-team-modal");
   const closeBtn = document.getElementById("join-team-modal-close");
 
-  if (openBtn && closeBtn) {
-    openBtn.addEventListener("click", () => joinModal.style.display = "block");
-    closeBtn.addEventListener("click", () => joinModal.style.display = "none");
+  if (modal && closeBtn) {
+    closeBtn.addEventListener("click", () => modal.style.display = "none");
   }
 }

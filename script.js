@@ -1660,13 +1660,13 @@ console.log('Script do modelo de resumos médicos carregado com novas funcionali
 
 // Inclui modals no corpo do html index
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("modals.html")
+  fetch("partials/modals.html")
     .then(response => response.text())
     .then(data => {
-      document.getElementById("modals-container").innerHTML = data;
+      document.getElementById("partials-container").innerHTML = data;
       initListeners();
     })
-    .catch(err => console.error("Erro ao carregar modals:", err));
+    .catch(err => console.error("Erro ao carregar partials:", err));
 });
 
 function initListeners() {

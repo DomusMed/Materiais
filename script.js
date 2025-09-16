@@ -1658,3 +1658,23 @@ window.MedicalResumeApp = {
 
 console.log('Script do modelo de resumos médicos carregado com novas funcionalidades');
 
+// Inclui modals no corpo do html index
+document.addEventListener("DOMContentLoaded", () => {
+  fetch("modals.html")
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById("modals-container").innerHTML = data;
+      initListeners();
+    })
+    .catch(err => console.error("Erro ao carregar modals:", err));
+});
+
+function initListeners() {
+  // Exemplo: fechar modal
+  const modal = document.getElementById("join-team-modal");
+  const closeBtn = document.getElementById("join-team-modal-close");
+
+  if (modal && closeBtn) {
+    closeBtn.addEventListener("click", () => modal.style.display = "none");
+  }
+}

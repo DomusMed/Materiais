@@ -119,22 +119,35 @@ let isDarkMode = false;
  */
 async function loadModals() {
   try {
+    console.log('Carregando modais e rodapé...');
+
+    // Calcula o caminho do modals.html baseado na pasta do script.js
     const scriptFolder = document.currentScript.src.replace(/\/[^\/]+$/, '');
     const modalsPath = `${scriptFolder}/modals.html`;
 
     const response = await fetch(modalsPath);
-    if (!response.ok) throw new Error(`Erro ao carregar modals: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`Erro ao carregar modals.html: ${response.status}`);
+    }
 
     const modalsHTML = await response.text();
     const modalsContainer = document.getElementById('modals-container');
-    if (modalsContainer) modalsContainer.innerHTML = modalsHTML;
 
-    console.log('Modais carregados com sucesso!');
-  } catch (err) {
-    console.error(err);
+    if (modalsContainer) {
+      modalsContainer.innerHTML = modalsHTML;
+      console.log('Modais e rodapé carregados com sucesso!');
+      return true;
+    } else {
+      console.error('Container de modais não encontrado');
+      return false;
+    }
+  } catch (error) {
+    console.error('Erro ao carregar modais:', error);
+    return false;
   }
 }
 
+// Chama a função
 loadModals();
 
 // ============================

@@ -127,7 +127,7 @@
         <textarea id="join-motivation" class="form-textarea" placeholder="Conte-nos sua motivação para apoiar o projeto DomusMed..." required></textarea>
       </div>
       
-      <p class="instruction-text">Ao clicar em "Enviar mensagem", seu cliente de e-mail será aberto com as informações preenchidas.</p>
+      <p class="instruction-text">Ao preencher seus dados e clicar em "Enviar mensagem", será aberto o aplicativo de e-mail do seu dispositivo para enviar as informações. Depois, é só aguardar o retorno do moderador. 📧</p>
       <button id="send-join-team-btn" class="send-btn">Enviar mensagem</button>
     </div>
   </div>
@@ -152,7 +152,7 @@
 
       <!-- Seleção de plataforma -->
       <div class="platform-selection">
-        </p><p><strong style="font-size: 25px;">Escolha a Plataforma</strong></p>
+        <p><strong style="font-size: 25px;">Escolha a Plataforma</strong></p>
         <div class="platform-buttons">
           <!-- Botões serão gerados dinamicamente pelo JavaScript -->
         </div>
@@ -170,6 +170,9 @@
       <div class="custom-input">
         <p><strong style="font-size: 25px;">Pergunta Personalizada</strong></p>
         <textarea id="custom-question" class="custom-question-input" placeholder="Digite sua dúvida específica aqui..."></textarea>
+        <p class="instruction-text">
+          👉 Selecione um texto na página, escolha a IA, use uma pergunta pronta ou escreva a sua. Ao clicar em "Enviar", a IA abrirá em outra guia: basta colar (Ctrl + V), pois tudo já estará copiado para você. 🚀
+        </p>
         <button id="send-custom-btn" class="send-custom-btn">Enviar Pergunta</button>
       </div>
 
@@ -187,6 +190,7 @@
     <div class="contact-modal-body">
       <p><strong>Envie sua mensagem para a equipe DomusMed:</strong></p>
       <textarea id="contact-message" class="contact-textarea" placeholder="Digite sua mensagem aqui..."></textarea>
+      <p class="instruction-text">Escreva o motivo do seu contato (qualquer assunto). Ao clicar em "Enviar", será aberto o aplicativo de e-mail padrão do seu dispositivo para que a mensagem seja enviada. Depois, é só aguardar a resposta do moderador 🙂</p>
       <button id="send-contact-btn" class="send-btn">Enviar por E-mail</button>
     </div>
   </div>
@@ -202,6 +206,9 @@
     <div class="edit-modal-body">
       <p><strong>Descreva sua sugestão de edição:</strong></p>
       <textarea id="edit-message" class="edit-textarea" placeholder="Descreva a edição sugerida..."></textarea>
+      <p class="instruction-text">
+        Selecione o trecho que deseja editar, escreva sua sugestão na caixa acima e clique em "Enviar". O aplicativo de e-mail do seu dispositivo será aberto, e você poderá incluir seus dados de contato e a fonte utilizada para a edição 📧
+      </p>
       <button id="send-edit-btn" class="send-btn">Enviar Sugestão</button>
     </div>
   </div>
@@ -221,7 +228,14 @@
       </div>
       <p><strong>Digite sua sugestão de alteração:</strong></p>
       <textarea id="github-suggestion" class="github-textarea" placeholder="Descreva sua sugestão de alteração..."></textarea>
-      <p class="instruction-text">Ao clicar em "Enviar", suas informações serão copiadas para a área de transferência. Basta colá-las no GitHub Discussion do projeto que abrirá em uma nova guia. Se você não possui cadastro no GitHub, basta criar um com seu próprio e-mail, é gratuito.</p>
+      <p class="instruction-text">
+        Selecione o trecho que deseja editar, escreva sua sugestão e clique em "Enviar". 
+        Uma nova guia será aberta com o GitHub Discussion, onde você deve incluir seus dados de contato e a fonte utilizada. 
+        É necessário ter cadastro no GitHub (pode ser feito com seu e-mail, é gratuito) 🙂 
+      </p>
+      <p class="instruction-text">
+        Ao clicar em "Enviar", suas informações serão compiladas e enviadas para o GitHub Discussion do projeto.
+      </p>
       <button id="send-github-btn" class="send-btn">Enviar para GitHub</button>
     </div>
   </div>
@@ -235,6 +249,8 @@
       <button id="tools-modal-close" class="modal-close">&times;</button>
     </div>
     <div class="tools-modal-body">
+      <p class="instruction-text">Aqui você pode mudar o tema da tela e ajustar o tamanho da letra de forma simples e rápida 😉</p>
+      
       <!-- Modo Claro/Escuro -->
       <div class="tool-section">
         <p><strong>🌓 Modo de Visualização</p></strong>

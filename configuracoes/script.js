@@ -111,28 +111,111 @@ let currentFontSize = 20;
 let isDarkMode = false;
 
 // ============================
+// DETECÇÃO DINÂMICA DE CAMINHOS
+// ============================
+
+/**
+ * Detecta o caminho base do projeto automaticamente
+ * Funciona tanto localmente quanto no GitHub Pages
+ */
+function detectBasePath() {
+  const currentPath = window.location.pathname;
+  
+  // Se estamos no GitHub Pages, o caminho pode incluir o nome do repositório
+  // Ex: /nome-repositorio/resumo/especialidades/cardiologia/arquivo.html
+  
+  // Procura pela pasta 'configuracoes' subindo na hierarquia
+  const pathParts = currentPath.split('/').filter(part => part !== '');
+  
+  // Remove o arquivo HTML do final se existir
+  if (pathParts.length > 0 && pathParts[pathParts.length - 1].includes('.html')) {
+    pathParts.pop();
+  }
+  
+  // Constrói o caminho relativo para a pasta configuracoes
+  let relativePath = '';
+  let levelsUp = 0;
+  
+  // Conta quantos níveis precisamos subir para chegar à raiz do projeto
+  for (let i = pathParts.length - 1; i >= 0; i--) {
+    if (pathParts[i] === 'configuracoes') {
+      // Se já estamos na pasta configuracoes
+      relativePath = './';
+      break;
+    } else {
+      levelsUp++;
+      relativePath += '../';
+    }
+  }
+  
+  // Se não encontrou a pasta configuracoes na hierarquia,
+  // assume que está na raiz ou usa caminho relativo padrão
+  if (relativePath === '') {
+    relativePath = './configuracoes/';
+  } else if (!relativePath.endsWith('configuracoes/')) {
+    relativePath += 'configuracoes/';
+  }
+  
+  console.log('Caminho base detectado:', relativePath);
+  return relativePath;
+}
+
+/**
+ * Tenta carregar um arquivo de múltiplos caminhos possíveis
+ */
+async function tryLoadFromPaths(filename, possiblePaths) {
+  for (const path of possiblePaths) {
+    try {
+      const fullPath = path + filename;
+      console.log(`Tentando carregar: ${fullPath}`);
+      
+      const response = await fetch(fullPath);
+      if (response.ok) {
+        console.log(`Sucesso ao carregar: ${fullPath}`);
+        return await response.text();
+      }
+    } catch (error) {
+      console.log(`Falha ao carregar de ${path}${filename}:`, error.message);
+    }
+  }
+  
+  throw new Error(`Não foi possível carregar ${filename} de nenhum caminho testado`);
+}
+
+// ============================
 // CARREGAMENTO DINÂMICO DE MODAIS
 // ============================
 
 /**
  * Carrega dinamicamente o conteúdo do arquivo modals.html
+ * Funciona com qualquer estrutura de pastas
  */
 async function loadModals() {
   try {
     console.log('Carregando modais e rodapé...');
-
-    // Calcula o caminho do modals.html baseado na pasta do script.js
-    const scriptFolder = document.currentScript.src.replace(/\/[^\/]+$/, '');
-    const modalsPath = `${scriptFolder}/modals.html`;
-
-    const response = await fetch(modalsPath);
-    if (!response.ok) {
-      throw new Error(`Erro ao carregar modals.html: ${response.status}`);
-    }
-
-    const modalsHTML = await response.text();
+    
+    // Detecta o caminho base automaticamente
+    const basePath = detectBasePath();
+    
+    // Lista de caminhos possíveis para tentar
+    const possiblePaths = [
+      basePath,                    // Caminho detectado automaticamente
+      './configuracoes/',          // Relativo à pasta atual
+      '../configuracoes/',         // Um nível acima
+      '../../configuracoes/',      // Dois níveis acima
+      '../../../configuracoes/',   // Três níveis acima
+      './modals.html',             // Na mesma pasta (fallback)
+      '../modals.html',            // Um nível acima (fallback)
+      '../../modals.html',         // Dois níveis acima (fallback)
+      '../../../modals.html'       // Três níveis acima (fallback)
+    ];
+    
+    // Remove duplicatas mantendo a ordem
+    const uniquePaths = [...new Set(possiblePaths)];
+    
+    const modalsHTML = await tryLoadFromPaths('modals.html', uniquePaths);
     const modalsContainer = document.getElementById('modals-container');
-
+    
     if (modalsContainer) {
       modalsContainer.innerHTML = modalsHTML;
       console.log('Modais e rodapé carregados com sucesso!');
@@ -146,9 +229,6 @@ async function loadModals() {
     return false;
   }
 }
-
-// Chama a função
-loadModals();
 
 // ============================
 // UTILITÁRIOS
@@ -1703,5 +1783,4 @@ window.MedicalResumeApp = {
   openToolsModal
 };
 
-console.log('Script do modelo de resumos médicos carregado com funcionalidade de carregamento dinâmico');
-
+console.log('Script do modelo de resumos médicos carregado com funcionalidade de carregamento dinâmico robusto');

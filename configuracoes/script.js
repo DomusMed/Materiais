@@ -121,7 +121,7 @@ async function loadModals() {
   try {
     console.log('Carregando modais e rodapé...');
     
-    const response = await fetch('modals.html');
+    const response = await fetch('/configuracoes/modals.html');
     if (!response.ok) {
       throw new Error(`Erro ao carregar modals.html: ${response.status}`);
     }

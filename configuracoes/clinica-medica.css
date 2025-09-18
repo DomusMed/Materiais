@@ -23,12 +23,12 @@ body.dark-mode {
   color: #e0e0e0;
 }
 
-body.dark-mode h0,
 body.dark-mode h1,
 body.dark-mode h2,
 body.dark-mode h3,
 body.dark-mode h4,
-body.dark-mode h5 {
+body.dark-mode h5,
+body.dark-mode h6 {
   color: #f0f0f0;
 }
 
@@ -67,12 +67,12 @@ body.dark-mode th {
    TIPOGRAFIA E TÍTULOS
    ============================ */
 
-h0, h1, h2, h3, h4, h5 {
+h1, h2, h3, h4, h5, h6 {
   font-family: 'Garamond', serif;
 }
 
 /* Título principal da página */
-h0 {
+h1 {
   display: block;
   font-size: 2.2em;
   font-weight: bold;
@@ -86,7 +86,7 @@ h0 {
 }
 
 /* Títulos de seção principal */
-h1 {
+h2 {
   font-size: 1.8em;
   text-align: center;
   color: #2e3a59;
@@ -96,7 +96,7 @@ h1 {
 }
 
 /* Subtítulos de seção */
-h2 {
+h3 {
   font-size: 1.6em;
   margin-top: 1.5em;
   margin-bottom: 0.4em;
@@ -108,7 +108,7 @@ h2 {
 }
 
 /* Subtítulos de subseção */
-h3 {
+h4 {
   font-size: 1.4em;
   margin-top: 1em;
   margin-bottom: 0.3em;
@@ -120,7 +120,7 @@ h3 {
   border-bottom: 1px solid #ccc;
 }
 
-h3::before {
+h4::before {
   content: "";
   position: absolute;
   left: 0;
@@ -132,14 +132,14 @@ h3::before {
 }
 
 /* Títulos menores */
-h4 {
+h5 {
   font-size: 1.2em;
   margin-top: 1em;
   margin-bottom: 0.3em;
   color: #444;
 }
 
-h5 {
+h6 {
   font-size: 1em;
   margin-top: 0.4em;
   margin-bottom: 0.0em;
@@ -147,7 +147,7 @@ h5 {
   color: #333;
 }
 
-h5 + p {
+h6 + p {
   margin-top: 0.2em;
 }
 
@@ -784,11 +784,11 @@ li {
   border-radius: 16px 16px 0 0;
 }
 
-.contact-modal-header h3,
-.edit-modal-header h3,
-.github-modal-header h3,
-.join-team-modal-header h3,
-.tools-modal-header h3 {
+.contact-modal-header h4,
+.edit-modal-header h4,
+.github-modal-header h4,
+.join-team-modal-header h4,
+.tools-modal-header h4 {
   margin: 0;
   font-size: 1.4em;
   font-weight: 600;
@@ -987,7 +987,7 @@ li {
   margin-bottom: 0;
 }
 
-.tool-section h4 {
+.tool-section h5 {
   color: #2e3a59;
   font-size: 1.2em;
   margin-bottom: 16px;
@@ -1167,7 +1167,7 @@ li {
   border-radius: 16px 16px 0 0;
 }
 
-.ai-modal-header h3 {
+.ai-modal-header h4 {
   margin: 0;
   font-size: 1.4em;
   font-weight: 600;
@@ -1204,7 +1204,7 @@ li {
   overflow-y: auto;
 }
 
-.ai-modal-body h4 {
+.ai-modal-body h5 {
   color: #2e3a59;
   font-size: 1.1em;
   margin-bottom: 12px;
@@ -1214,7 +1214,7 @@ li {
   padding-bottom: 8px;
 }
 
-.ai-modal-body h4:first-child {
+.ai-modal-body h5:first-child {
   margin-top: 0;
 }
 
@@ -1486,10 +1486,10 @@ li {
     padding: 16px 20px;
   }
 
-  .ai-modal-header h3,
-  .contact-modal-header h3,
-  .edit-modal-header h3,
-  .tools-modal-header h3 {
+  .ai-modal-header h4,
+  .contact-modal-header h4,
+  .edit-modal-header h4,
+  .tools-modal-header h4 {
     font-size: 1.2em;
   }
 
@@ -1501,7 +1501,7 @@ li {
     max-height: 65vh;
   }
 
-  .ai-modal-body h4 {
+  .ai-modal-body h5 {
     font-size: 1em;
     margin-top: 16px;
   }

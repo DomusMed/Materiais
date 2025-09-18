@@ -1376,7 +1376,7 @@ function createSidebarOverlay() {
  * Gera o sumário automaticamente baseado nos cabeçalhos da página
  */
 function generateSummary() {
-  const headers = document.querySelectorAll('h0, h1, h2, h3, h4');
+  const headers = document.querySelectorAll('h1, h2, h3, h4');
   const lista = document.getElementById('lista-sumario');
   
   if (!lista) {
@@ -1390,8 +1390,8 @@ function generateSummary() {
   let summaryCount = 0;
   
   headers.forEach((header, index) => {
-    // Pula h0 se for o título principal
-    if (header.tagName === 'H0' && index === 0) {
+    // Pula h1 se for o título principal
+    if (header.tagName === 'H1' && index === 0) {
       return;
     }
     

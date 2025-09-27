@@ -10,6 +10,7 @@
  * - Controle da sidebar retrátil
  * - Barra de progresso de leitura
  * - Cache bust de imagens
+ * - Modal de imagens em tela cheia
  * - Responsividade e acessibilidade
  * - Assistente IA com seleção de texto e integração ChatGPT/OpenEvidence/Consensus/Perplexity
  * - Menu flutuante com sub-botões
@@ -109,6 +110,121 @@ let currentPlatform = 'chatgpt';
 let isFloatingMenuOpen = false;
 let currentFontSize = 20;
 let isDarkMode = false;
+
+// ============================
+// CACHE BUST AUTOMÁTICO DE IMAGENS
+// ============================
+
+/**
+ * Aplica cache bust automático em todas as imagens
+ * Garante que sempre carregue a versão mais recente do Google Drive
+ */
+function applyCacheBustToAllImages() {
+  const timestamp = new Date().getTime();
+  
+  // Aplica cache bust na capa
+  const capaImg = document.getElementById('capa');
+  if (capaImg && capaImg.src) {
+    const separator = capaImg.src.includes('?') ? '&' : '?';
+    capaImg.src = capaImg.src.split('?')[0] + separator + 't=' + timestamp;
+    console.log('Cache bust aplicado à imagem de capa');
+  }
+  
+  // Aplica cache bust nas imagens do corpo do texto
+  const estudoImgs = document.querySelectorAll('.estudo-img');
+  estudoImgs.forEach((img, index) => {
+    if (img.src) {
+      const separator = img.src.includes('?') ? '&' : '?';
+      img.src = img.src.split('?')[0] + separator + 't=' + (timestamp + index);
+      console.log(`Cache bust aplicado à imagem estudo-img ${index + 1}`);
+    }
+  });
+}
+
+// ============================
+// MODAL DE IMAGEM EM TELA CHEIA
+// ============================
+
+/**
+ * Cria o modal de imagem em tela cheia
+ */
+function createImageModal() {
+  // Verifica se já existe
+  if (document.getElementById('image-modal')) {
+    return;
+  }
+
+  const modal = document.createElement('div');
+  modal.id = 'image-modal';
+  modal.className = 'image-modal';
+  
+  const img = document.createElement('img');
+  img.id = 'modal-image';
+  
+  modal.appendChild(img);
+  document.body.appendChild(modal);
+  
+  // Event listener para fechar ao clicar
+  modal.addEventListener('click', closeImageModal);
+  
+  console.log('Modal de imagem criado');
+}
+
+/**
+ * Abre imagem em tela cheia
+ */
+function openImageModal(imageSrc, imageAlt) {
+  const modal = document.getElementById('image-modal');
+  const modalImg = document.getElementById('modal-image');
+  
+  if (modal && modalImg) {
+    modalImg.src = imageSrc;
+    modalImg.alt = imageAlt || 'Imagem em tela cheia';
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+/**
+ * Fecha o modal de imagem
+ */
+function closeImageModal() {
+  const modal = document.getElementById('image-modal');
+  
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+/**
+ * Configura event listeners para imagens com modal
+ */
+function setupImageModalListeners() {
+  // Adiciona event listeners apenas para imagens com class="estudo-img"
+  const estudoImgs = document.querySelectorAll('.estudo-img');
+  
+  estudoImgs.forEach(img => {
+    img.addEventListener('click', () => {
+      openImageModal(img.src, img.alt);
+    });
+    
+    // Adiciona cursor pointer para indicar que é clicável
+    img.style.cursor = 'pointer';
+  });
+  
+  // Event listener para ESC fechar modal
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('image-modal');
+      if (modal && modal.classList.contains('active')) {
+        closeImageModal();
+      }
+    }
+  });
+  
+  console.log(`Event listeners configurados para ${estudoImgs.length} imagens estudo-img`);
+}
 
 // ============================
 // DETECÇÃO DINÂMICA DE CAMINHOS
@@ -496,7 +612,7 @@ function closeAIModal() {
  * Configura event listeners do assistente IA
  */
 function setupAIEventListeners() {
-  // Botão para abrir modal
+  // Botão principal do assistente IA
   const aiBtn = document.getElementById('ai-assistant-btn');
   if (aiBtn) {
     aiBtn.addEventListener('click', openAIModal);
@@ -1233,29 +1349,6 @@ function setupToolsListeners() {
 }
 
 // ============================
-// CACHE BUST DE IMAGENS
-// ============================
-
-/**
- * Aplica cache bust em todas as imagens com ID
- * Previne problemas de cache em imagens externas
- */
-function applyCacheBust() {
-  const images = document.querySelectorAll('img[id]');
-  
-  images.forEach(img => {
-    if (img.src && !img.src.includes('?t=')) {
-      const separator = img.src.includes('?') ? '&' : '?';
-      img.src = img.src + separator + 't=' + new Date().getTime();
-      console.log('Cache bust aplicado à imagem:', img.id);
-    }
-  });
-}
-
-// Executa após carregar a página
-window.addEventListener('load', applyCacheBust);
-
-// ============================
 // CRIAÇÃO DINÂMICA DE ELEMENTOS DE INTERFACE
 // ============================
 
@@ -1658,26 +1751,32 @@ async function initializeApp() {
     }
     
     // 2. Aplica cache bust nas imagens
-    applyCacheBust();
+    applyCacheBustToAllImages();
     
-    // 3. Cria elementos de interface dinamicamente
+    // 3. Cria modal de imagem
+    createImageModal();
+    
+    // 4. Configura event listeners para imagens
+    setupImageModalListeners();
+    
+    // 5. Cria elementos de interface dinamicamente
     createProgressBar();
     createToggleButton();
     createSidebar();
     
-    // 4. Gera sumário automaticamente
+    // 6. Gera sumário automaticamente
     generateSummary();
     
-    // 5. Configura event listeners
+    // 7. Configura event listeners
     setupEventListeners();
     
-    // 6. Inicializa assistente IA
+    // 8. Inicializa assistente IA
     initializeAIAssistant();
     
-    // 7. Inicializa novas funcionalidades
+    // 9. Inicializa novas funcionalidades
     initializeNewFeatures();
     
-    // 8. Atualiza progresso inicial
+    // 10. Atualiza progresso inicial
     updateProgress();
     
     console.log('Aplicação inicializada com sucesso!');
@@ -1765,6 +1864,12 @@ function reinitialize() {
   // Atualiza progresso
   updateProgress();
   
+  // Reaplica cache bust
+  applyCacheBustToAllImages();
+  
+  // Reconfigura event listeners para imagens
+  setupImageModalListeners();
+  
   console.log('Aplicação reinicializada');
 }
 
@@ -1780,7 +1885,10 @@ window.MedicalResumeApp = {
   updateFontSize,
   openContactModal,
   openEditModal,
-  openToolsModal
+  openToolsModal,
+  openImageModal,
+  closeImageModal,
+  applyCacheBustToAllImages
 };
 
-console.log('Script do modelo de resumos médicos carregado com funcionalidade de carregamento dinâmico robusto');
+console.log('Script do modelo de resumos médicos carregado com funcionalidades de cache bust e modal de imagens');

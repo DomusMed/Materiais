@@ -334,7 +334,6 @@ async function loadModals() {
     
     if (modalsContainer) {
       modalsContainer.innerHTML = modalsHTML;
-      applyCacheBust();
       console.log('Modais e rodapé carregados com sucesso!');
       return true;
     } else {

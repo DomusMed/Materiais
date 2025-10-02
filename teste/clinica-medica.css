@@ -203,7 +203,6 @@ box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 
 .external-figure {
   text-align: center; /* Centraliza imagem e legenda */
-  max-width: 40%; /* Herda o max-width da imagem para consistência */
   margin: 2em auto; /* Centraliza a figure na página com margens */
 }
 

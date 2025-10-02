@@ -209,6 +209,37 @@ box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   }
 }
 
+.external-figure {
+  text-align: center; /* Centraliza imagem e legenda */
+  max-width: 40%; /* Herda o max-width da imagem para consistência */
+  margin: 2em auto; /* Centraliza a figure na página com margens */
+}
+
+.external-figure figcaption {
+  font-size: 0.8em; /* Tamanho menor para a legenda */
+  text-align: center; /* Centraliza o texto da legenda */
+  margin-top: 0.5em; /* Espaço acima da legenda */
+  color: #666; /* Cor sutil para não destacar demais */
+  line-height: 1.3; /* Melhora a legibilidade */
+}
+
+/* Ajustes para modo escuro */
+body.dark-mode .external-figure figcaption {
+  color: #bbb; /* Cor mais clara para visibilidade no modo escuro */
+}
+
+/* Responsividade para figuras externas */
+@media (max-width: 768px) {
+  .external-figure {
+    max-width: 90%; /* Ajusta para telas menores, herdando da .external-img */
+    margin: 1.5em auto;
+  }
+
+  .external-figure figcaption {
+    font-size: 0.75em; /* Ligeiramente menor em mobile para caber melhor */
+  }
+}
+
 /* ============================
    MODAL DE IMAGEM EM TELA CHEIA
    ============================ */

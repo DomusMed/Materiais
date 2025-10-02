@@ -185,6 +185,22 @@ h6 + p {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
+.external-img {
+display: block;
+margin: 2em auto;
+max-width: 40%;
+height: auto;
+border-radius: 12px;
+box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+cursor: pointer;
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.external-img:hover {
+transform: translateY(-2px);
+box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
 /* Responsividade para imagens do corpo */
 @media (max-width: 768px) {
   .estudo-img {

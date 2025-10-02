@@ -185,11 +185,48 @@ h6 + p {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
+.external-img {
+display: block;
+margin: 2em auto;
+max-width: 40%;
+height: auto;
+border-radius: 12px;
+box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+cursor: pointer;
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.external-img:hover {
+transform: translateY(-2px);
+box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.external-figure {
+  text-align: center; /* Centraliza imagem e legenda */
+  margin: 2em auto; /* Centraliza a figure na página com margens */
+}
+
+.external-figure figcaption {
+  font-size: 0.8em; /* Tamanho menor para a legenda */
+  text-align: center; /* Centraliza o texto da legenda */
+  margin-top: 0.5em; /* Espaço acima da legenda */
+  color: #666; /* Cor sutil para não destacar demais */
+  line-height: 1.3; /* Melhora a legibilidade */
+}
+
+/* Ajustes para modo escuro */
+body.dark-mode .external-figure figcaption {
+  color: #bbb; /* Cor mais clara para visibilidade no modo escuro */
+}
+
 /* Responsividade para imagens do corpo */
 @media (max-width: 768px) {
   .estudo-img {
     max-width: 90%;
     margin: 1.5em auto;
+  }
+  .external-figure figcaption {
+    font-size: 0.75em; /* Ligeiramente menor em mobile para caber melhor */
   }
 }
 
@@ -1747,4 +1784,3 @@ body.dark-mode .footer-domus {
 body.dark-mode .footer-text {
   color: #e0e0e0;
 }
-

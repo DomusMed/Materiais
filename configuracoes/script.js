@@ -141,6 +141,19 @@ function applyCacheBustToAllImages() {
   });
 }
 
+/**
+ * Aplica cache bust apenas em imagens do Google Drive, pulando externas
+ */
+function applySelectiveCacheBust() {
+  applyCacheBustToAllImages();  // Chama a função existente para imagens do Google Drive
+
+  // Para imagens externas, não faz nada (pula cache bust)
+  const externalImgs = document.querySelectorAll('.external-img');
+  externalImgs.forEach((img, index) => {
+    console.log(`Cache bust pulado para imagem external-img ${index + 1}`);
+  });
+}
+
 // ============================
 // MODAL DE IMAGEM EM TELA CHEIA
 // ============================
@@ -201,10 +214,12 @@ function closeImageModal() {
  * Configura event listeners para imagens com modal
  */
 function setupImageModalListeners() {
-  // Adiciona event listeners apenas para imagens com class="estudo-img"
+  // Adiciona event listeners apenas para imagens com class="estudo-img" e "external-img"
   const estudoImgs = document.querySelectorAll('.estudo-img');
-  
-  estudoImgs.forEach(img => {
+  const externalImgs = document.querySelectorAll('.external-img');
+  const allImgs = [...estudoImgs, ...externalImgs];  // Combina as duas classes sem alterar o existente
+
+  allImgs.forEach(img => {
     img.addEventListener('click', () => {
       openImageModal(img.src, img.alt);
     });
@@ -212,6 +227,8 @@ function setupImageModalListeners() {
     // Adiciona cursor pointer para indicar que é clicável
     img.style.cursor = 'pointer';
   });
+  
+  console.log(`Event listeners configurados para ${allImgs.length} imagens (estudo-img + external-img)`);
   
   // Event listener para ESC fechar modal
   document.addEventListener('keydown', (e) => {
@@ -1751,7 +1768,7 @@ async function initializeApp() {
     }
     
     // 2. Aplica cache bust nas imagens
-    applyCacheBustToAllImages();
+    applySelectiveCacheBust();
     
     // 3. Cria modal de imagem
     createImageModal();
@@ -1865,7 +1882,7 @@ function reinitialize() {
   updateProgress();
   
   // Reaplica cache bust
-  applyCacheBustToAllImages();
+  applySelectiveCacheBust();
   
   // Reconfigura event listeners para imagens
   setupImageModalListeners();
@@ -1892,4 +1909,3 @@ window.MedicalResumeApp = {
 };
 
 console.log('Script do modelo de resumos médicos carregado com funcionalidades de cache bust e modal de imagens');
-

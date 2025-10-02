@@ -1346,6 +1346,31 @@ function setupToolsListeners() {
       updateFontSize(size);
     });
   });
+  
+    // Botão de impressão
+  const printBtn = document.getElementById('print-btn');
+  if (printBtn) {
+    printBtn.addEventListener('click', () => {
+      closeAllModals();
+      setTimeout(() => {
+        window.print();
+      }, 400); // Pequeno delay para modais sumirem
+    });
+  }
+
+  // Botão de resumo rápido
+  const quickSummaryBtn = document.getElementById('quick-summary-btn');
+  if (quickSummaryBtn) {
+    quickSummaryBtn.addEventListener('click', () => {
+      closeAllModals();
+      setTimeout(() => {
+        openAIModal();
+        setTimeout(() => {
+          processQuestion('Faça um resumo objetivo do conteúdo para estudo prático.');
+        }, 300);
+      }, 400);
+    });
+  }
 }
 
 // ============================

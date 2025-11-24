@@ -1,0 +1,2539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DomusMed</title>
+    <link rel="icon" href="https://lh3.googleusercontent.com/d/1WU9ZGk_H_vbbrTiwKYoruVrFJ1m0WUu0" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Paleta DomusMed - Azul Marinho Médico */
+            --primary-navy: #0A4C6A;
+            --secondary-navy: #1a5f7f;
+            --accent-gold: #E09F3E;
+            --light-blue: #5B9FB8;
+            --light-gray: #F5F7FA;
+            --medium-gray: #E8EBED;
+            --dark-gray: #4A5568;
+            --white: #FFFFFF;
+            --shadow: rgba(10, 76, 106, 0.15);
+            --success: #10B981;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--white);
+            color: var(--dark-gray);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Animações */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Header/Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px var(--shadow);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 4px 30px var(--shadow);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-navy);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            margin-top: 12px;
+        }
+
+        .logo span {
+            color: var(--accent-gold);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 35px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary-navy);
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            background: var(--primary-navy);
+            color: var(--white) !important;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-cta:hover {
+            background: var(--secondary-navy);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--shadow);
+        }
+
+        .nav-cta::after {
+            display: none;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        section {
+            padding: 100px 0;
+            position: relative;
+        }
+
+        /* 1. HEADLINE - Hero Section */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-navy) 100%);
+            position: relative;
+            overflow: hidden;
+            padding-top: 140px;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: var(--light-blue);
+            border-radius: 50%;
+            top: -300px;
+            right: -200px;
+            opacity: 0.1;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -100px;
+            opacity: 0.08;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text {
+            color: var(--white);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-text h1 {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 25px;
+            letter-spacing: -1px;
+        }
+
+        .hero-text .subtitle {
+            font-size: 22px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--accent-gold);
+            color: var(--primary-navy);
+            padding: 18px 38px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(224, 159, 62, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(224, 159, 62, 0.4);
+            animation: pulse 1s infinite;
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            padding: 18px 38px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .hero-visual {
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero-image-wrapper {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--white);
+            opacity: 0.9;
+        }
+
+        /* 2. VÍDEO VSL */
+        .video-section {
+            background: var(--light-gray);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 60px;
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: var(--accent-gold);
+            color: var(--primary-navy);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary-navy);
+            margin-bottom: 20px;
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+
+        .section-subtitle {
+            font-size: 20px;
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+
+        .video-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 30px 80px var(--shadow);
+            background: var(--primary-navy);
+        }
+
+        .video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-navy), var(--secondary-navy));
+            color: var(--white);
+        }
+
+        .play-button {
+            width: 100px;
+            height: 100px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(224, 159, 62, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 50px rgba(224, 159, 62, 0.6);
+        }
+
+        .play-button::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-left: 25px solid var(--primary-navy);
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            margin-left: 6px;
+        }
+
+        .video-placeholder p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        /* 3. LEAD - Cenário */
+        .lead-section {
+            background: var(--white);
+        }
+
+        .lead-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .lead-questions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .question-card {
+            background: var(--light-gray);
+            padding: 40px 30px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-navy), var(--accent-gold));
+        }
+
+        .question-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-gold);
+            box-shadow: 0 15px 40px var(--shadow);
+        }
+
+        .question-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            filter: grayscale(0.2);
+        }
+
+        .question-card h3 {
+            color: var(--primary-navy);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .question-card p {
+            color: var(--dark-gray);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* 4. HISTÓRIA */
+        .historia-section {
+            background: var(--light-gray);
+        }
+
+        .historia-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .historia-text h2 {
+            font-size: 42px;
+            color: var(--primary-navy);
+            margin-bottom: 30px;
+            line-height: 1.3;
+            font-weight: 800;
+        }
+
+        .historia-text p {
+            font-size: 18px;
+            margin-bottom: 25px;
+            line-height: 1.8;
+            color: var(--dark-gray);
+        }
+
+        .historia-text .highlight {
+            color: var(--primary-navy);
+            font-weight: 700;
+            font-size: 20px;
+            border-left: 4px solid var(--accent-gold);
+            padding-left: 20px;
+            margin: 30px 0;
+            font-style: italic;
+        }
+
+        .historia-image {
+            position: relative;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px var(--shadow);
+        }
+
+        .historia-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(10, 76, 106, 0.8) 0%, transparent 100%);
+            display: flex;
+            align-items: flex-end;
+            padding: 40px;
+            color: var(--white);
+        }
+
+        /* 5. PITCH - Recursos */
+        .pitch-section {
+            background: var(--white);
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 35px;
+            margin-top: 60px;
+        }
+
+        .resource-card {
+            background: var(--light-gray);
+            border-radius: 25px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 60px var(--shadow);
+            border-color: var(--accent-gold);
+        }
+
+        .resource-icon-wrapper {
+            background: linear-gradient(135deg, var(--primary-navy), var(--secondary-navy));
+            padding: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .resource-icon-wrapper::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
+            opacity: 0.1;
+        }
+
+        .resource-icon {
+            font-size: 64px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .resource-content {
+            padding: 35px;
+        }
+
+        .resource-content h3 {
+            color: var(--primary-navy);
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .resource-content p {
+            color: var(--dark-gray);
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .resource-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-navy);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .resource-link:hover {
+            color: var(--accent-gold);
+            gap: 12px;
+        }
+
+        /* 6. EVIDÊNCIA - Testemunhos */
+        .evidencia-section {
+            background: var(--primary-navy);
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .evidencia-section::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            top: -250px;
+            left: -250px;
+            opacity: 0.05;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 35px;
+            margin-top: 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .testimonial-card::before {
+            content: '"';
+            font-size: 100px;
+            color: var(--accent-gold);
+            opacity: 0.2;
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .testimonial-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonial-text {
+            font-size: 17px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-navy);
+            font-weight: 800;
+            font-size: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .author-info h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .author-info p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-top: 80px;
+            padding: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-box .number {
+            font-size: 52px;
+            font-weight: 800;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+        }
+
+        .stat-box .label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* 7. OFERTA - Preços */
+        .oferta-section {
+            background: var(--light-gray);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .pricing-card {
+            background: var(--white);
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px var(--shadow);
+            transition: all 0.4s ease;
+            border: 3px solid transparent;
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--accent-gold);
+            transform: scale(1.05);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 80px var(--shadow);
+        }
+
+        .pricing-card.featured:hover {
+            transform: translateY(-10px) scale(1.07);
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: 20px;
+            right: -35px;
+            background: var(--accent-gold);
+            color: var(--primary-navy);
+            padding: 8px 50px;
+            font-weight: 700;
+            font-size: 13px;
+            transform: rotate(45deg);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .pricing-header {
+            background: linear-gradient(135deg, var(--primary-navy), var(--secondary-navy));
+            color: var(--white);
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .pricing-card.featured .pricing-header {
+            background: linear-gradient(135deg, var(--accent-gold), #D4892B);
+            color: var(--primary-navy);
+        }
+
+        .pricing-header h3 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .pricing-header .description {
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        .pricing-body {
+            padding: 50px 40px;
+        }
+
+        .price-display {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .old-price {
+            font-size: 22px;
+            color: var(--dark-gray);
+            text-decoration: line-through;
+            opacity: 0.6;
+            margin-bottom: 10px;
+        }
+
+        .current-price {
+            font-size: 64px;
+            font-weight: 800;
+            color: var(--primary-navy);
+            margin-bottom: 5px;
+            line-height: 1;
+        }
+
+        .current-price .currency {
+            font-size: 32px;
+            vertical-align: top;
+        }
+
+        .price-period {
+            font-size: 16px;
+            color: var(--dark-gray);
+            margin-top: 10px;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 40px;
+        }
+
+        .features-list li {
+            padding: 18px 0;
+            border-bottom: 1px solid var(--medium-gray);
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            font-size: 16px;
+        }
+
+        .features-list li:last-child {
+            border-bottom: none;
+        }
+
+        .check-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            flex-shrink: 0;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .pricing-cta {
+            width: 100%;
+            text-align: center;
+        }
+
+        /* 8. ACORDO - Urgência e Garantia */
+        .acordo-section {
+            background: var(--white);
+        }
+
+        .acordo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .acordo-card {
+            background: var(--light-gray);
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .acordo-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-gold);
+            box-shadow: 0 15px 40px var(--shadow);
+        }
+
+        .acordo-icon {
+            font-size: 56px;
+            margin-bottom: 20px;
+        }
+
+        .acordo-card h3 {
+            color: var(--primary-navy);
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .acordo-card p {
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+
+        .guarantee-box {
+            max-width: 800px;
+            margin: 60px auto;
+            background: linear-gradient(135deg, var(--primary-navy), var(--secondary-navy));
+            color: var(--white);
+            padding: 50px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 25px 60px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .guarantee-box::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            top: -150px;
+            right: -150px;
+            opacity: 0.1;
+        }
+
+        .guarantee-icon {
+            font-size: 80px;
+            margin-bottom: 25px;
+        }
+
+        .guarantee-box h3 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+        .guarantee-box p {
+            font-size: 18px;
+            line-height: 1.7;
+            opacity: 0.95;
+        }
+
+        .urgency-banner {
+            background: linear-gradient(135deg, #DC2626, #B91C1C);
+            color: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .urgency-banner h3 {
+            font-size: 28px;
+            margin-bottom: 25px;
+            font-weight: 800;
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .timer-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 25px 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            min-width: 100px;
+        }
+
+        .timer-number {
+            font-size: 48px;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .timer-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        /* 9. Q&A - Perguntas Frequentes */
+        .qa-section {
+            background: var(--light-gray);
+        }
+
+        .faq-container {
+            max-width: 900px;
+            margin: 60px auto 0;
+        }
+
+        .faq-item {
+            background: var(--white);
+            margin-bottom: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        .faq-question {
+            padding: 30px 35px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            color: var(--primary-navy);
+            font-size: 18px;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .faq-question:hover {
+            color: var(--accent-gold);
+        }
+
+        .faq-toggle {
+            width: 35px;
+            height: 35px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-navy);
+            font-size: 20px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(45deg);
+            background: var(--primary-navy);
+            color: var(--accent-gold);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 600px;
+        }
+
+        .faq-answer-content {
+            padding: 0 35px 35px;
+            color: var(--dark-gray);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        /* CTA Final */
+        .final-cta-section {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-navy) 100%);
+            color: var(--white);
+            text-align: center;
+            padding: 120px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .final-cta-section::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            top: -300px;
+            right: -200px;
+            opacity: 0.05;
+        }
+
+        .final-cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .final-cta-content h2 {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            line-height: 1.2;
+        }
+
+        .final-cta-content p {
+            font-size: 22px;
+            margin-bottom: 50px;
+            opacity: 0.95;
+        }
+
+        /* Footer */
+        .footer {
+            background: #0a1f2e;
+            color: var(--white);
+            padding: 80px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .footer-brand h3 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: var(--accent-gold);
+        }
+
+        .footer-brand p {
+            line-height: 1.7;
+            opacity: 0.8;
+            font-size: 15px;
+        }
+
+        .footer-section h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--accent-gold);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: var(--white);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--accent-gold);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+            text-align: center;
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--primary-navy);
+            cursor: pointer;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 60px;
+            }
+
+            .hero-text h1 {
+                font-size: 42px;
+            }
+
+            .historia-content {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+                gap: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-menu {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: var(--white);
+                flex-direction: column;
+                padding: 40px;
+                gap: 25px;
+                transition: left 0.3s ease;
+                box-shadow: 0 10px 30px var(--shadow);
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .section-title {
+                font-size: 36px;
+            }
+
+            .hero-text h1 {
+                font-size: 32px;
+            }
+
+            .hero-text .subtitle {
+                font-size: 18px;
+            }
+
+            .hero-stats {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+
+            .countdown-timer {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .timer-box {
+                min-width: 80px;
+                padding: 20px;
+            }
+
+            .timer-number {
+                font-size: 36px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 0 20px;
+            }
+
+            .hero-section {
+                padding-top: 120px;
+            }
+
+            section {
+                padding: 60px 0;
+            }
+           .footer-brand img {
+               filter: brightness(0) invert(1);
+            }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+            <img src="https://lh3.googleusercontent.com/d/1CAV1xbDtXy5Pz_lI0dHocMbVNcEJDUyu" alt="DomusMed" style="height: 50px; width: auto;">
+            </a>
+            <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#recursos">Recursos</a></li>
+                <li><a href="#depoimentos">Depoimentos</a></li>
+                <li><a href="#precos">Planos</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="https://www.domusmed.site/paginas/sumario.html" class="nav-cta">Começar Agora</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 1. HEADLINE - Hero Section -->
+    <section class="hero-section" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="hero-badge">
+                        Direcione Seus Estudos Médicos
+                    </div>
+                    <h1>Estudo inteligente, de médicos para médicos</h1>
+                    <p class="subtitle"> Resumos <strong><em>colaborativos e gratuitos</em></strong>, criados com base em materiais "refinados" com apoio da inteligência artificial para <strong><em>potencializar</em></strong> e <strong><em>direcionar</em></strong> seu aprendizado rumo à <strong><em>residência médica</em></strong>.</p>
+                    <div class="hero-buttons">
+                        <a href="#recursos" class="btn-primary">
+                            Conhecer Recursos
+                        </a>
+                    </div>
+                </div>
+                    <div class="hero-visual">
+                        <div class="hero-image-wrapper">
+                            <img src="https://lh3.googleusercontent.com/d/117MHZTb47OX6GReaO1MrPIOQ6NtH4qKO" alt="Plataforma DomusMed" style="width: 100%; border-radius: 15px;">
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. VÍDEO VSL -->
+
+    <!-- 3. LEAD - Cenário do Problema -->
+    <section class="lead-section animate-on-scroll" id="problema">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">💭 Você Se Identifica?</span>
+                <h2 class="section-title">Estes desafios estão impedindo seu progresso?</h2>
+                <p class="section-subtitle">Acredite, estes obstáculos são comuns a todos nós… E digo mais, com o passar do tempo, só piora 😂</p><br>
+            </div>
+            <div class="lead-content">
+                <div class="lead-questions">
+                    <div class="question-card">
+                        <div class="question-icon">😰</div>
+                        <h3>Estudando horas sem ver resultados</h3>
+                        <p>Você passa horas estudando, mas sente que não está retendo o conteúdo de forma eficaz para as provas</p>
+                    </div>
+                    <div class="question-card">
+                        <div class="question-icon">📚</div>
+                        <h3>Perdido em tanto material</h3>
+                        <p>Tem acesso a diversos recursos, mas não sabe por onde começar ou como organizá-los de forma estratégica</p>
+                    </div>
+                    <div class="question-card">
+                        <div class="question-icon">⏰</div>
+                        <h3>Falta de tempo e método</h3>
+                        <p>Sente que o tempo está passando e você não tem um método comprovado para otimizar seus estudos</p>
+                    </div>
+                    <div class="question-card">
+                        <div class="question-icon">🎯</div>
+                        <h3>Dificuldade no raciocínio clínico</h3>
+                        <p>Tem dificuldade em conectar teoria com prática e desenvolver um raciocínio clínico estruturado</p>
+                    </div>
+                    <div class="question-card">
+                        <div class="question-icon">💤</div>
+                        <h3>Informações que não fixam</h3>
+                        <p>Estuda um conteúdo hoje e na semana seguinte já esqueceu, pois não está revisando da forma adequada</p>
+                    </div>
+                    <div class="question-card">
+                        <div class="question-icon">📄</div>
+                        <h3>Dificuldade em filtrar o que é confiável</h3>
+                        <p>Com tantas fontes e resumos, é difícil saber em qual confiar e o que realmente corresponde ao que cai nas provas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. HISTÓRIA -->
+    <section class="historia-section animate-on-scroll" id="historia">
+        <div class="container">
+            <div class="historia-content">
+                <div class="historia-text">
+                    <h2>Eu sei exatamente como é estar nesse ponto da jornada...</h2>
+
+
+    <p>
+        Há pouco mais de um ano, finalizei a graduação em Medicina. Achei que, ao me formar, teria uma sensação de domínio total sobre a área — ou ao menos do "básico de tudo" — mas não demorou muito para ficar claro que é impossível estudar tudo. Isso ficou ainda mais evidente no último ano de faculdade, quando o prazo para finalizar o curso era incompatível com o tempo necessário para aprender todo o "gap" que ainda faltava. A pressão da faculdade, com sua carga de conteúdo, nos dá a sensação de que sempre se faz pouco, e eu demorei a perceber que realmente deve-se começar pelo essencial e básico. Não há como aprender conceitos complexos e avançados se o básico não estiver consolidado.
+    </p>
+
+    <p>
+        Várias vezes passei por "recaídas de super-herói", acreditando que a capacidade cerebral primata conseguiria estudar todo o conteúdo: Harrison, Cecil, UpToDate, Dynamed, PCDT do Ministério da Saúde... Colocar TUDO em uma linha sequencial para cada conteúdo e criar um cronograma de estudos do tipo <em>"The Ultimate Medicine Study Guide"</em>... Qual a chance disso dar certo? 😂 Queria ter tido menos recaídas dessas durante a faculdade.
+    </p>
+
+    <p>
+        As recaídas eram intercaladas por períodos de estudos com base em uma única fonte, o que dava a sensação de que eu não estava estudando o conteúdo por completo. Ministério da Saúde? Mas e se não estiver atualizado... UpToDate? Mas será que se aplica fielmente à realidade brasileira...
+    </p>
+
+    <p>
+        Depois de várias e várias recaídas desse tipo, acredito que a conclusão seja única (ou algo bem semelhante) para todos: o estudo deve ser guiado por objetivos!
+    </p>
+
+    <p>
+        Percebi que precisava de uma forma direcionada de aprender, baseada em objetivos concretos.
+    </p>
+
+    <p>
+        Para provas de residência médica, o foco deve ser o que as provas realmente cobram — objetividade total.
+    </p>
+
+    <p>
+        Para a prática médica, estudar casos clínicos reais, que transformam o conhecimento técnico em raciocínio aplicado.
+    </p>
+
+    <p>
+        Quando se juntam essas duas frentes, tudo passa a fazer sentido. Estudo guiado por objetivos.
+    </p>
+
+    <p>
+        Então, talvez o objetivo seja o seguinte: professores ensinam alunos a serem médicos para que eles possam virar professores e ensinar mais alunos a serem médicos, para que eles possam virar professores e ensinar mais alunos a serem médicos (e tomando café)... Um esquema de pirâmide! 😂
+    </p>
+
+    <p>
+        Brincadeiras à parte, qual é o objetivo final? Ajudar a pessoa que estiver na nossa frente durante o atendimento. Tudo isso e só isso. Fim comum da Medicina.
+    </p>
+
+    <p>
+        E é com base nesta modesta e humilde reflexão de um médico recém-formado, que nem sequer iniciou a residência médica ainda (formou-se pelo ProUni, de família humilde, recém-casado porque não tinha dinheiro para fazer o casamento que a esposa merecia — é necessário montar aquela reserva primeiro), que foi criado o projeto <strong>DomusMed</strong>.
+    </p>
+
+    <p class="highlight">
+        Gratuito (e sempre será), colaborativo, direcionado!
+    </p>
+
+                </div>
+                    <div class="hero-visual">
+                        <div class="hero-image-wrapper">
+                            <img src="https://lh3.googleusercontent.com/d/1CAV1xbDtXy5Pz_lI0dHocMbVNcEJDUyu" alt="Plataforma DomusMed" style="width: 100%; border-radius: 15px;">
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. PITCH - Apresentação da Solução -->
+    <section class="pitch-section animate-on-scroll" id="recursos">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">🚀 A Solução</span>
+
+                    <div class="hero-visual">
+                        <div class="hero-image-wrapper">
+                            <img src="https://lh3.googleusercontent.com/d/1CAV1xbDtXy5Pz_lI0dHocMbVNcEJDUyu" alt="Plataforma DomusMed" style="width: 100%; border-radius: 15px;">
+                        </div>
+                    </div>
+			
+			<br>
+
+                <p class="section-subtitle">Resumos médicos objetivos, didáticos, com conteúdo selecionado com base em módulos de cursos preparatórios para provas de residência médica no Brasil.</p>
+
+            </div>
+
+                <div class="historia-text">
+                    <h2>Funcionalidades implementadas</h2>
+		</div>
+
+            <div class="resources-grid">
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">📝</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Resumos interativos por especialidades</h3>
+                        <p>Resumos objetivos com o conteúdo "refinado" e muito bem explicado, organizado por especialidades médicas.</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">🎯</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Direto ao ponto</h3>
+                        <p>A melhor combinação entre quantidade x qualidade de conteúdo: Nem tão básico, nem tão extenso. Suficiente como recurso teórico único para estudo do conteúdo.</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">✅</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Facilidade no acesso</h3>
+                        <p>Clique no link do resumo. Abra no navegador. Use. Só isso. Não precisa cadastro. Não precisa inserir dados. Não precisa pagar 💸.</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">🤖</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Assistente IA integrado</h3>
+                        <p>Selecione qualquer trecho, pergunte o que quiser e escolha entre ChatGPT, OpenEvidence, Consensus ou Perplexity (versões gratuitas). É tipo ter um professor particular 24/7 (só que não cobra por hora).</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">💡</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Perguntas prontas pra IA</h3>
+                        <p>Use uma das perguntas prontas (as que mais comumente precisamos durante o estudo): "Explique pra uma criança de 10 anos", "Crie um caso clínico", "Resuma em um parágrafo"... entre outras!</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">📑</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Conteúdo sumarizado</h3>
+                        <p>Navegue pelo conteúdo com um clique. O sumário lateral te leva direto ao tópico desejado.</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">⏱️</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Tempo estimado de leitura</h3>
+                        <p>A barra de progresso te mostra em tempo real o prazo estimado para completar a leitura do conteúdo. Dá até pra planejar um café estratégico entre os estudos.</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">🌙</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Modo escuro</h3>
+                        <p>Porque ninguém merece ficar cego estudando os derivados dos arcos branquiais e ciclo de Krebs às 3h da manhã.</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">🔤</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Tamanho da fonte personalizável</h3>
+                        <p>Dispensa explicações.</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">🖼️</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Imagens em tela cheia</h3>
+                        <p>Clique em qualquer imagem do corpo do texto e veja em tamanho real.</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">🤝</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Feito por médicos, para médicos</h3>
+                        <p>100% gratuito e colaborativo. Você pode sugerir edições, melhorias e juntar-se ao projeto.</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">✏️</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Viu algo errado?</h3>
+                        <p>Selecione o trecho, clique em "Sugerir Edição" e pronto. Pode ser por e-mail ou GitHub. Seu feedback ajuda todo mundo a estudar melhor.</p>
+                    </div>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">📱</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Funciona em qualquer lugar</h3>
+                        <p>Celular, tablet, computador... não importa. O layout se adapta. Basta ter internet. Estude no ônibus, no plantão, na fila do SUS... Pode até baixar em pdf e imprimir, para os adeptos a conteúdo físico (só não esquece que seu pdf impresso não vai receber atualizações 😉).</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">🔄</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Sempre atualizado</h3>
+                        <p>Ponto importante aqui: O conteúdo ainda está em projeto "beta", passando por revisões e inclusão de mídia. O objetivo é chegarmos a um número considerável de usuários e colaboradores para que o conteúdo esteja sempre atualizado com base no que é cobrado pelas bancas de residência médica.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="section-header">
+
+            </div>
+
+                <div class="historia-text">
+                    <h2>Em breve...</h2>
+		</div>
+
+            <div class="resources-grid">
+
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">📚</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Resumos completos</h3>
+                        <p>Os resumos de Ginecologia, Obstetrícia, Pediatria, Medicina Preventiva e Cirurgia estão sendo finalizados. Em breve, estarão disponíveis para acesso, tudo organizado e pronto para estudo.</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">🔍</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Anexo de mídias nos materiais</h3>
+                        <p>Os resumos estão passando por revisão. Em breve, serão inclusas imagens, diagramas e breves vídeos explicativos. Estudar arritmias sem ver ECG, estudar pneumonias sem ver radiografia e ir no Mc comer alface, não faz sentido...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="section-header">
+
+            </div>
+
+                <div class="historia-text">
+                    <h2>Projetos futuros</h2>
+		</div>
+
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">🔗</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Resumos interativos por síndromes</h3>
+                        <p>Resumos que conectam as especialidades através de uma visão sindrômica — porque em casos clínicos, os pacientes não chegam rotulados com "cardiologia" ou "neurologia". Na verdade, esta é a real visão da medicina na prática.</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">📈</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Fluxogramas</h3>
+                        <p>Abordagem sindrômica visual e simplificada pra guiar o raciocínio. Serve como uma espinha dorsal para o conteúdo a ser estudado, onde "blocos" de conhecimento vão se encaixando em cada passo na hierarquia sequencial. Ta aí outro ponto que eu gostaria de ter dado mais atenção durante a faculdade.</p>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">🃏</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Flashcards</h3>
+                        <p>Dispensa apresentações. De longe o melhor recurso que conheci. Pena que comecei a usar apenas no último ano de faculdade. Projeto de criação de baralhos também com edição colaborativa, seguindo o mesmo princípio dos resumos.</p>
+                    </div>
+                </div>
+
+<div class="resource-card">
+                    <div class="resource-icon-wrapper">
+                        <div class="resource-icon">🏛️</div>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Palácios de memória</h3>
+                        <p>Memória visual para conceitos de difícil memorização e fáceis de confundir. Acredito que este vai ser um grande desafio. Colaboradores serão muito bem-vindos. Provavelmente, inicialmente teremos Palácios de Memória em texto, roteiros para deixar fluir a imaginação. Acredite, são ridiculamente poderosos para retenção no longo prazo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. EVIDÊNCIA - Depoimentos e Prova Social -->
+    <section class="evidencia-section animate-on-scroll" id="depoimentos">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge" style="background: var(--accent-gold); color: var(--primary-navy);">
+                    ⭐ Prova Social
+                </span>
+                <h2 class="section-title" style="color: var(--white);">O que os usuários estão dizendo...</h2>
+                <p class="section-subtitle" style="color: var(--white); opacity: 0.9;">Por enquanto, nada! Hahaha Seja um dos primeiros a prestar um depoimento para que outros médicos e acadêmicos possam se unir ao projeto. Entre em contato e nos diga o que achou.</p>
+            </div>
+
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p class="testimonial-text">"Aguardando sua mensagem de depoimento para incluí-la neste espaço... 😉"</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">DR</div>
+                            <div class="author-info">
+                                <h4>Dr...</h4>
+                                <p>Médico</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p class="testimonial-text">"Aguardando sua mensagem de depoimento para incluí-la neste espaço... 😉"</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">DR</div>
+                            <div class="author-info">
+                                <h4>Dr...</h4>
+                                <p>Médico</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p class="testimonial-text">"Aguardando sua mensagem de depoimento para incluí-la neste espaço... 😉"</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">DR</div>
+                            <div class="author-info">
+                                <h4>Dr...</h4>
+                                <p>Médico</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-section animate-on-scroll">
+                <div class="stat-box">
+                    <div class="number">Zero</div>
+                    <div class="label">Estudantes e Médicos</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">??</div>
+                    <div class="label">Taxa de Satisfação</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">?/5</div>
+                    <div class="label">Avaliação Média</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. OFERTA - Planos e Preços -->
+    <section class="oferta-section animate-on-scroll" id="precos">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Nada a perder... <em>Acesso gratuito</em>: Clique, experimente e tire as prórpias conclusões</h2>
+                <p class="section-subtitle">
+		<br>
+                    É gratuito, e sempre será.
+		<br>
+		<br>
+                </p>
+            </div>
+
+            <div class="pricing-grid">
+
+                <!-- Plano Completo (Featured) -->
+                <div class="pricing-card featured animate-on-scroll">
+                    <div class="pricing-header">
+                        <h3>Completo</h3>
+                        <p class="description">Tudo que você precisa de material teórico para a aprovação</p>
+                    </div>
+                    <div class="pricing-body">
+                        <div class="price-display">
+                            <div class="current-price">
+                                <span class="currency"></span> Gratuito
+                            </div>
+                            <div class="price-period">• Acesso vitalício</div>
+                        </div>
+
+                        <ul class="features-list">
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span><strong>📝 Resumos interativos por especialidades</strong></span>
+                            </li>
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span>Conteúdo "refinado" e muito bem explicado, organizado por especialidades médicas</span>
+                            </li>
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span><strong>🎯 Direto ao ponto:</strong> Nem tão básico, nem tão extenso. Suficiente como recurso teórico único</span>
+                            </li>
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span><strong>✅ Facilidade no acesso:</strong> Sem cadastro, sem dados, sem pagamento. Só clicar e usar</span>
+                            </li>
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span><strong>🤖 Assistente IA integrado:</strong> ChatGPT, OpenEvidence, Consensus ou Perplexity (versões gratuitas)</span>
+                            </li>
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span><strong>💡 Perguntas prontas pra IA:</strong> "Explique pra uma criança de 10 anos", "Crie um caso clínico", "Resuma em um parágrafo"...</span>
+                            </li>
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span><strong>📑 Conteúdo sumarizado:</strong> Navegue pelo sumário lateral com um clique</span>
+                            </li>
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span><strong>⏱️ Tempo estimado de leitura:</strong> Barra de progresso em tempo real</span>
+                            </li>
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span><strong>🌙 Modo escuro:</strong> Porque ninguém merece ficar cego estudando às 3h da manhã</span>
+                            </li>
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span><strong>🔤 Tamanho da fonte personalizável</strong></span>
+                            </li>
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span><strong>🖼️ Imagens em tela cheia:</strong> Clique em qualquer imagem e veja em tamanho real</span>
+                            </li>
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span><strong>🤝 Feito por médicos, para médicos:</strong> 100% gratuito e colaborativo</span>
+                            </li>
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span><strong>✏️ Colaborativo:</strong> Selecione o trecho e sugira edições por e-mail ou GitHub</span>
+                            </li>
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span><strong>📱 Funciona em qualquer lugar:</strong> Celular, tablet, computador... Basta ter internet</span>
+                            </li>
+                            <li>
+                                <span class="check-icon">✓</span>
+                                <span><strong>🔄 Sempre atualizado:</strong> Conteúdo em projeto "beta", passando por revisões e inclusão de mídia</span>
+                            </li>
+                            <li>
+                                <span class="check-icon">⏳</span>
+                                <span><strong>📚 Em breve: Resumos completos</strong> de GO, Pediatria, Medicina Preventiva e Cirurgia</span>
+                            </li>
+                            <li>
+                                <span class="check-icon">⏳</span>
+                                <span><strong>🔍 Em breve: Anexo de mídias</strong> — imagens, diagramas e breves vídeos explicativos (porque estudar arritmias sem ver ECG não faz sentido...)</span>
+                            </li>
+                        </ul>
+
+                        <div class="pricing-cta">
+                            <a href="https://www.domusmed.site/paginas/sumario.html" class="btn-primary" style="width: 100%; justify-content: center;">
+                                Acesse aqui
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. ACORDO - Garantia, Urgência e Bônus -->
+    <section class="acordo-section animate-on-scroll" id="garantia">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">🎯 Decisão Sem Riscos</span>
+            </div>
+
+            <div class="guarantee-box animate-on-scroll">
+                <div class="guarantee-icon">🛡️</div>
+                <h3>Garantia Incondicional de ∞ Dias</h3>
+                <p>
+                    Aqui os marketeiros colocam a promessa de reembolso em caso de insatisfação. Então vou converter a promessa em um pedido: Se por qualquer motivo estiver 
+                    satisfeito com o conteúdo, a plataforma ou os resultados, por favor, não deixe de unir-se ao projeto com sugestões de edição e feedbacks. Toda ajuda e colaboração é bem-vinda.
+                </p>
+                <p style="margin-top: 20px; font-weight: 700; font-size: 20px;">
+                    Junte-se ao projeto.
+                </p>
+            </div>
+
+            <div class="urgency-banner animate-on-scroll">
+                <h3>⚠️ Atenção: Vagas Ilimitadas!</h3>
+                <p style="font-size: 18px; margin-bottom: 10px;">
+                    Não tenha pressa, pois <strong style="font-size: 32px; color: var(--accent-gold);">não há limite de vagas</strong>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. Q&A - Perguntas Frequentes -->
+    <section class="qa-section animate-on-scroll" id="faq">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">❓ Dúvidas Comuns</span>
+                <h2 class="section-title">Dúvidas que você pode ter...</h2>
+            </div>
+
+            <div class="faq-container">
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>O material é realmente 100% gratuito?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        Sim. Não é “pegadinha de marketing” nem período de teste escondido. 
+                        O acesso aos resumos é 100% gratuito, sem necessidade de cadastro, cartão, e-mail ou qualquer dado pessoal. 
+                        Basta clicar no link, abrir no navegador e usar. A ideia é ser um projeto colaborativo e acessível para qualquer estudante ou médico.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Preciso fazer login ou criar conta para acessar?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        Não. O acesso é direto. Você não precisa criar usuário, senha, confirmar e-mail, nem nada do tipo. 
+                        A proposta é justamente reduzir ao máximo o atrito: clicou, abriu, estudou. 
+                        Se quiser colaborar com sugestões ou feedbacks, aí sim você pode entrar em contato pelos canais indicados na página.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Esse material substitui um curso preparatório para residência médica?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        Não é essa a proposta. Os resumos são baseados em módulos de cursos preparatórios e em conteúdo direcionado para prova, 
+                        mas não se apresentam como substituto oficial de nenhum curso. 
+                        A ideia é ser um <strong>recurso teórico único e organizado</strong> para estudo do conteúdo, 
+                        que pode ser usado sozinho ou como complemento ao que você já faz em outras plataformas ou cursinhos.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>O conteúdo é confiável, mesmo sendo colaborativo e gratuito?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                                       <p>
+                                           Sim, e essa é uma preocupação central do projeto. Os resumos são feitos por médico, com base em materiais de referência, 
+                                           sendo primariamente construídos a partir de módulos de cursinhos preparatórios para provas de residência médica, 
+                                           o que permite refinar o conteúdo para o que é mais importante no estudo direcionado 
+                                           (cursos preparatórios, diretrizes, protocolos e literatura relevante). 
+                                           Além disso, passam por revisão contínua. 
+                                           O fato de ser colaborativo não significa “bagunça”; pelo contrário, significa que erros podem ser identificados mais rápido 
+                                           e corrigidos com a ajuda da comunidade. Sempre que possível, o conteúdo é ajustado conforme o que as bancas de residência realmente cobram.
+                                       </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Os resumos foram criados com IA?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        Sim, a IA foi utilizada como ferramenta de apoio, mas não de forma generativa. 
+                        O conteúdo médico foi fornecido por médico, e a IA ajudou na formatação, organização e estruturação da escrita. 
+                        Por isso, pode haver alguns erros pontuais de redação nos resumos, mas o conteúdo está em processo de revisão contínua. 
+                        É exatamente aí que entra a importância da colaboração: quanto mais pessoas revisarem e sugerirem melhorias, 
+                        melhor fica o material para todos. Este trabalho colaborativo une esforços e melhora absurdamente a qualidade de forma contínua, 
+                        beneficiando toda a comunidade de usuários.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>O que significa o projeto ainda estar em “beta”?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        Significa que o conteúdo está em constante construção, revisão e melhoria. 
+                        Alguns módulos já estão mais maduros, enquanto outros ainda estão sendo escritos, revisados ou ganhando imagens e mídias. 
+                        Em vez de esperar “a versão perfeita” para disponibilizar, a proposta é abrir o acesso desde já e ir aprimorando com base no uso real e no feedback dos usuários.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Quais especialidades já têm resumos disponíveis e quais ainda estão em construção?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        Alguns conteúdos por especialidade já estão disponíveis com estrutura bem definida e utilizáveis para estudo imediato. 
+                        Outros, como Ginecologia, Obstetrícia, Pediatria, Medicina Preventiva e Cirurgia, estão em fase de finalização 
+                        e serão liberados progressivamente. A ideia é ir ampliando o acervo de forma organizada, sem atropelar a qualidade.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Como a inteligência artificial é usada nos resumos? Não é perigoso depender de IA?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        A IA não substitui o conteúdo médico nem “inventa guideline”. 
+                        Ela entra como <strong>ferramenta de apoio ao estudo</strong>: você seleciona um trecho e pode pedir explicações, resumos, 
+                        casos clínicos, analogias etc. usando modelos como ChatGPT, OpenEvidence, Consensus ou Perplexity (nas versões gratuitas). 
+                        O conteúdo base continua sendo construído com critério; a IA é um extra para ajudar a entender melhor, revisar e fixar.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Preciso pagar para usar o assistente de IA integrado?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        Não. A integração é feita usando versões gratuitas das ferramentas (como ChatGPT Free, Perplexity Free etc.). 
+                        Você usa o que já estaria disponível para qualquer pessoa, só que de uma forma mais organizada dentro do contexto do resumo. 
+                        Em alguns casos, pode ser necessário ter uma conta gratuita na plataforma de IA escolhida, mas isso é tudo.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+ <div class="faq-item">
+            <div class="faq-question">
+                <span>Como funcionam as “perguntas prontas pra IA” na prática?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        Deixamos algumas sugestões básicas e universais prontas, 
+                        como “Explique para uma criança de 10 anos”, “Crie um caso clínico”, “Resuma em um parágrafo” ou “Compare com outra doença”. 
+                        Você escolhe a pergunta que faz sentido para o seu momento de estudo, clica, copia e usa direto no assistente de IA. 
+                        É um atalho para transformar o resumo em algo mais ativo e personalizado. Há também o campo para criação de seus próprios prompts.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Esse material serve só para provas de residência ou também para prática clínica?</span>
+                <span class="faq-toggle">+</>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        Serve para os dois, com focos complementares. 
+                        A base dos resumos é voltada ao que as bancas de residência médica no Brasil cobram, 
+                        mas a forma como o conteúdo é organizado (por especialidade, com visão prática, uso de casos clínicos e, futuramente, fluxogramas e abordagens sindrômicas) 
+                        também ajuda muito na prática clínica. A ideia é que o que você estuda para a prova não seja “descartável” no consultório ou no plantão.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Vou conseguir estudar só pelos resumos ou vou precisar de mais fontes?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        A proposta é que os resumos sejam <strong>suficientes como recurso teórico único</strong> para o conteúdo que abordam,
+                        especialmente para quem tem pouco tempo e precisa de objetividade. 
+                        Ainda assim, se você gosta de aprofundar mais em temas específicos, pode (e deve) complementar com livros, diretrizes e artigos. 
+                        A DomusMed entra como a base organizada, não como a única verdade da Medicina.
+                        <br><br>
+                        Além disso, é importante lembrar que <strong>teoria sozinha não resolve</strong>: 
+                        recursos como <strong>flashcards</strong> (para memorização ativa e revisão espaçada) e <strong>questões comentadas</strong> 
+                        (para treinar o estilo das provas e o raciocínio de banca) são fundamentais em qualquer preparação séria. 
+                        A plataforma <strong>ainda não oferece flashcards nem banco de questões</strong>, 
+                        então a recomendação é que você associe os resumos da DomusMed a algum app de flashcards e a uma boa fonte de questões 
+                        para potencializar ao máximo o seu estudo.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>O conteúdo está completo ou ainda faltam partes importantes?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        Alguns módulos já estão bem estruturados e utilizáveis do início ao fim. 
+                        Outros ainda estão em expansão, principalmente nas especialidades que foram adicionadas mais recentemente. 
+                        Sempre que algo estiver claramente em construção, a ideia é deixar isso transparente para você saber exatamente o que já está “redondo” 
+                        e o que ainda está em desenvolvimento.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Posso baixar o conteúdo em PDF ou usar offline?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        Sim. Você pode baixar em PDF e até imprimir, se preferir estudar no papel. 
+                        A única ressalva é que o PDF baixado não recebe atualizações automáticas. 
+                        Ou seja, se o conteúdo for revisado ou ampliado, a versão mais recente estará sempre no site. 
+                        Para quem quer estar sempre com o material atualizado, o ideal é usar a versão online sempre que possível.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Como funciona a parte colaborativa? Eu realmente posso editar o conteúdo?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        Você pode sugerir correções, ajustes e melhorias. 
+                        Ao selecionar um trecho, há a opção de “Sugerir Edição”, pode ser feita por e-mail ou via GitHub. 
+                        As sugestões passam por avaliação antes de serem incorporadas, para manter a consistência e a qualidade. 
+                        A ideia é que a DomusMed seja construída por médicos e estudantes, não apenas consumida passivamente.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Quem está por trás do projeto DomusMed?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        O projeto foi criado por um médico recém-formado, egresso de família humilde, bolsista ProUni, 
+                        que ainda está na jornada de estudos para residência médica e para prática clínica. 
+                        Ou seja, alguém que vive na pele as mesmas dúvidas, limitações de tempo e sobrecarga de conteúdo que você.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Se é gratuito, qual é o “ganho” do projeto?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        O ganho principal é acadêmico e comunitário: organizar o próprio aprendizado, 
+                        ajudar outros estudantes e médicos e construir algo útil para a comunidade médica. 
+                        No futuro, o projeto pode abrir portas para colaborações mais próximas, 
+                        para a criação de <strong>materiais extras e opcionais</strong> (eventualmente pagos) como forma de ajudar no custeio 
+                        da plataforma, que hoje é mantida basicamente pelo fundador, e também para apoiar causas sociais relacionadas à saúde. 
+                        Mas é importante deixar claro: <strong>não há venda de curso, mentoria em massa ou “funil secreto” por trás</strong>. 
+                        Tudo será sempre feito de forma transparente, sem pegadinhas, gatilhos de urgência forçados ou sensação de escassez artificial. 
+                        A proposta central permanece a mesma: conhecimento acessível, bem organizado e honesto.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Já existem depoimentos ou prova social sobre a DomusMed?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        Ainda não. O projeto está em fase inicial, e justamente por isso a prova social está “zerada”. 
+                        Em vez de inventar números ou relatos, a proposta é ser honesto: 
+                        você pode ser um dos primeiros a usar, testar e, se fizer sentido para você, deixar um depoimento sincero 
+                        para ajudar outros estudantes e médicos a conhecerem a plataforma.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Existe algum tipo de suporte se eu tiver dúvidas ou dificuldades técnicas?</span>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    <p>
+                        Sim. Mesmo sendo uma plataforma gratuita, você pode entrar em contato pelo e-mail 
+                        <strong>contato@domusmed.site</strong> para relatar problemas técnicos, sugerir melhorias ou tirar dúvidas sobre o uso do material. 
+                        A resposta pode não ser "instantânea estilo call center", mas há um cuidado real em ouvir e ajustar o projeto com base no feedback dos usuários. 
+                        <br><br>
+                        <strong>Dica importante:</strong> Para sugestões de edição de conteúdo ou correções nos resumos, 
+                        prefira usar os links de "Sugerir Edição" disponíveis diretamente em cada resumo. 
+                        Eles possuem configurações que facilitam muito o processo de revisão e ajustes, 
+                        tornando tudo mais rápido e organizado para todos.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="final-cta-section" id="cta-final">
+        <div class="container">
+            <div class="final-cta-content animate-on-scroll">
+                <h2>Chega de papo...</h2>
+                <h2>Vamos começar e ver o que você acha?</h2>
+                <p>O projeto ainda está no início e sem “milhares de usuários”, mas você já pode começar a usar a plataforma agora, testar os resumos na prática e ajudar a construir um material cada vez melhor para toda a comunidade médica.</p>
+
+                <div class="hero-buttons" style="justify-content: center;">
+                    <a href="https://www.domusmed.site/paginas/sumario.html" class="btn-primary" style="font-size: 20px; padding: 22px 50px;">
+                        🚀 Acessar o material agora
+                    </a>
+                </div>
+                <p style="margin-top: 40px; font-size: 16px; opacity: 0.8;">
+                    ✅ Acesso Imediato • 🆓 Gratuito • 🛡️ Material direcionado
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                    <div class="footer-brand">
+                    <img src="https://lh3.googleusercontent.com/d/1j1-oMvKa3oMvH3jOugATRqw-qdgPXpON" alt="DomusMed" style="height: 60px; width: auto; margin-bottom: 15px;">
+                      <p>
+                          Uma plataforma em construção que organiza conhecimento médico essencial de forma <strong><em>colaborativa e gratuita</em></strong>, 
+                          com suporte de IA para ajudar na compreensão e revisão, visando facilitar o estudo direcionado para residência médica e prática clínica.
+                      </p>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Navegação</h4>
+                    <ul class="footer-links">
+                        <li><a href="#home">Início</a></li>
+                        <li><a href="#recursos">Recursos</a></li>
+                        <li><a href="#depoimentos">Depoimentos</a></li>
+                        <li><a href="#precos">Planos</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Suporte</h4>
+                    <ul class="footer-links">
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#garantia">Garantia</a></li>
+                        <li><a href="https://www.domusmed.site/paginas/manual-de-instrucoes.html">Manual de Instruções</a></li>
+                        <li><a href="mailto:contato@domusmed.site">Contato</a></li>
+                        <li><a href="https://www.domusmed.site/paginas/termos-de-uso.html">Termos de Uso</a></li>
+                        <li><a href="https://www.domusmed.site/paginas/politica-de-privacidade.html">Política de Privacidade</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2025 DomusMed. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Animação ao scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        function toggleMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const navHeight = document.querySelector('.navbar').offsetHeight;
+                    const targetPosition = target.offsetTop - navHeight;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+
+                    // Fechar menu mobile após clicar
+                    const navMenu = document.getElementById('navMenu');
+                    navMenu.classList.remove('active');
+                }
+            });
+        });
+
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const faqItem = question.parentElement;
+                const isActive = faqItem.classList.contains('active');
+                
+                // Fechar todos os FAQs
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Abrir o clicado se não estava ativo
+                if (!isActive) {
+                    faqItem.classList.add('active');
+                }
+            });
+        });
+
+        // Countdown Timer
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const tomorrow = new Date();
+            tomorrow.setHours(24, 0, 0, 0);
+            const distance = tomorrow - now;
+
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        }
+
+        // Atualizar countdown a cada segundo
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Play button video (simulação)
+        const playButton = document.querySelector('.play-button');
+        if (playButton) {
+            playButton.addEventListener('click', function() {
+                alert('Aqui você integraria seu vídeo VSL (YouTube, Vimeo, Wistia, etc.)\n\nExemplo de integração:\nconst videoWrapper = document.querySelector(".video-wrapper");\nvideoWrapper.innerHTML = \'<iframe src="SUA_URL_DO_VIDEO" frameborder="0" allowfullscreen></iframe>\';');
+            });
+        }
+
+        // Controle de vagas (simulação)
+        const vagasElement = document.querySelector('.urgency-banner strong');
+        if (vagasElement) {
+            let vagas = 47;
+            setInterval(() => {
+                if (vagas > 10 && Math.random() > 0.7) {
+                    vagas--;
+                    vagasElement.textContent = vagas;
+                }
+            }, 30000); // Reduz a cada 30 segundos aleatoriamente
+        }
+
+        // Animação de entrada inicial
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '1';
+        });
+
+        // Prevenção de scroll horizontal
+        document.body.style.overflowX = 'hidden';
+
+        console.log('🏥 DomusMed - Plataforma carregada com sucesso!');
+        console.log('💡 Template de 9 passos implementado');
+        console.log('🎨 Design responsivo e interativo pronto');
+    </script>
+</body>
+</html>

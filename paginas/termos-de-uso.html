@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termos de Uso - DomusMed</title>
+    <link rel="icon" href="https://lh3.googleusercontent.com/d/1WU9ZGk_H_vbbrTiwKYoruVrFJ1m0WUu0" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Paleta DomusMed - Azul Marinho Médico */
+            --primary-navy: #0A4C6A;
+            --secondary-navy: #1a5f7f;
+            --accent-gold: #E09F3E;
+            --light-blue: #5B9FB8;
+            --light-gray: #F5F7FA;
+            --medium-gray: #E8EBED;
+            --dark-gray: #4A5568;
+            --white: #FFFFFF;
+            --shadow: rgba(10, 76, 106, 0.15);
+            --success: #10B981;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--white);
+            color: var(--dark-gray);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Animações */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Header/Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px var(--shadow);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 4px 30px var(--shadow);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-navy);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            margin-top: 12px;
+        }
+
+        .logo span {
+            color: var(--accent-gold);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 35px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary-navy);
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            background: var(--primary-navy);
+            color: var(--white) !important;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-cta:hover {
+            background: var(--secondary-navy);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--shadow);
+        }
+
+        .nav-cta::after {
+            display: none;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        section {
+            padding: 100px 0;
+            position: relative;
+        }
+
+        /* 1. HEADLINE - Hero Section */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-navy) 100%);
+            position: relative;
+            overflow: hidden;
+            padding-top: 140px;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: var(--light-blue);
+            border-radius: 50%;
+            top: -300px;
+            right: -200px;
+            opacity: 0.1;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -100px;
+            opacity: 0.08;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text {
+            color: var(--white);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-text h1 {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 25px;
+            letter-spacing: -1px;
+        }
+
+        .hero-text .subtitle {
+            font-size: 22px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--accent-gold);
+            color: var(--primary-navy);
+            padding: 18px 38px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(224, 159, 62, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(224, 159, 62, 0.4);
+            animation: pulse 1s infinite;
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            padding: 18px 38px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .hero-visual {
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero-image-wrapper {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--white);
+            opacity: 0.9;
+        }
+
+        /* 2. VÍDEO VSL */
+        .video-section {
+            background: var(--light-gray);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 60px;
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: var(--accent-gold);
+            color: var(--primary-navy);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary-navy);
+            margin-bottom: 20px;
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+
+        .section-subtitle {
+            font-size: 20px;
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+
+        .video-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 30px 80px var(--shadow);
+            background: var(--primary-navy);
+        }
+
+        .video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-navy), var(--secondary-navy));
+            color: var(--white);
+        }
+
+        .play-button {
+            width: 100px;
+            height: 100px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(224, 159, 62, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 50px rgba(224, 159, 62, 0.6);
+        }
+
+        .play-button::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-left: 25px solid var(--primary-navy);
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            margin-left: 6px;
+        }
+
+        .video-placeholder p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        /* 3. LEAD - Cenário */
+        .lead-section {
+            background: var(--white);
+        }
+
+        .lead-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .lead-questions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .question-card {
+            background: var(--light-gray);
+            padding: 40px 30px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-navy), var(--accent-gold));
+        }
+
+        .question-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-gold);
+            box-shadow: 0 15px 40px var(--shadow);
+        }
+
+        .question-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            filter: grayscale(0.2);
+        }
+
+        .question-card h3 {
+            color: var(--primary-navy);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .question-card p {
+            color: var(--dark-gray);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* 4. HISTÓRIA */
+        .historia-section {
+            background: var(--light-gray);
+        }
+
+        .historia-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .historia-text h2 {
+            font-size: 42px;
+            color: var(--primary-navy);
+            margin-bottom: 30px;
+            line-height: 1.3;
+            font-weight: 800;
+        }
+
+        .historia-text p {
+            font-size: 18px;
+            margin-bottom: 25px;
+            line-height: 1.8;
+            color: var(--dark-gray);
+        }
+
+        .historia-text .highlight {
+            color: var(--primary-navy);
+            font-weight: 700;
+            font-size: 20px;
+            border-left: 4px solid var(--accent-gold);
+            padding-left: 20px;
+            margin: 30px 0;
+            font-style: italic;
+        }
+
+        .historia-image {
+            position: relative;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px var(--shadow);
+        }
+
+        .historia-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(10, 76, 106, 0.8) 0%, transparent 100%);
+            display: flex;
+            align-items: flex-end;
+            padding: 40px;
+            color: var(--white);
+        }
+
+        /* 5. PITCH - Recursos */
+        .pitch-section {
+            background: var(--white);
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 35px;
+            margin-top: 60px;
+        }
+
+        .resource-card {
+            background: var(--light-gray);
+            border-radius: 25px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 60px var(--shadow);
+            border-color: var(--accent-gold);
+        }
+
+        .resource-icon-wrapper {
+            background: linear-gradient(135deg, var(--primary-navy), var(--secondary-navy));
+            padding: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .resource-icon-wrapper::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
+            opacity: 0.1;
+        }
+
+        .resource-icon {
+            font-size: 64px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .resource-content {
+            padding: 35px;
+        }
+
+        .resource-content h3 {
+            color: var(--primary-navy);
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .resource-content p {
+            color: var(--dark-gray);
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .resource-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-navy);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .resource-link:hover {
+            color: var(--accent-gold);
+            gap: 12px;
+        }
+
+        /* 6. EVIDÊNCIA - Testemunhos */
+        .evidencia-section {
+            background: var(--primary-navy);
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .evidencia-section::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            top: -250px;
+            left: -250px;
+            opacity: 0.05;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 35px;
+            margin-top: 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .testimonial-card::before {
+            content: '"';
+            font-size: 100px;
+            color: var(--accent-gold);
+            opacity: 0.2;
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .testimonial-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonial-text {
+            font-size: 17px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-navy);
+            font-weight: 800;
+            font-size: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .author-info h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .author-info p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-top: 80px;
+            padding: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-box .number {
+            font-size: 52px;
+            font-weight: 800;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+        }
+
+        .stat-box .label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* 7. OFERTA - Preços */
+        .oferta-section {
+            background: var(--light-gray);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .pricing-card {
+            background: var(--white);
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px var(--shadow);
+            transition: all 0.4s ease;
+            border: 3px solid transparent;
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--accent-gold);
+            transform: scale(1.05);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 80px var(--shadow);
+        }
+
+        .pricing-card.featured:hover {
+            transform: translateY(-10px) scale(1.07);
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: 20px;
+            right: -35px;
+            background: var(--accent-gold);
+            color: var(--primary-navy);
+            padding: 8px 50px;
+            font-weight: 700;
+            font-size: 13px;
+            transform: rotate(45deg);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .pricing-header {
+            background: linear-gradient(135deg, var(--primary-navy), var(--secondary-navy));
+            color: var(--white);
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .pricing-card.featured .pricing-header {
+            background: linear-gradient(135deg, var(--accent-gold), #D4892B);
+            color: var(--primary-navy);
+        }
+
+        .pricing-header h3 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .pricing-header .description {
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        .pricing-body {
+            padding: 50px 40px;
+        }
+
+        .price-display {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .old-price {
+            font-size: 22px;
+            color: var(--dark-gray);
+            text-decoration: line-through;
+            opacity: 0.6;
+            margin-bottom: 10px;
+        }
+
+        .current-price {
+            font-size: 64px;
+            font-weight: 800;
+            color: var(--primary-navy);
+            margin-bottom: 5px;
+            line-height: 1;
+        }
+
+        .current-price .currency {
+            font-size: 32px;
+            vertical-align: top;
+        }
+
+        .price-period {
+            font-size: 16px;
+            color: var(--dark-gray);
+            margin-top: 10px;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 40px;
+        }
+
+        .features-list li {
+            padding: 18px 0;
+            border-bottom: 1px solid var(--medium-gray);
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            font-size: 16px;
+        }
+
+        .features-list li:last-child {
+            border-bottom: none;
+        }
+
+        .check-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            flex-shrink: 0;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .pricing-cta {
+            width: 100%;
+            text-align: center;
+        }
+
+        /* 8. ACORDO - Urgência e Garantia */
+        .acordo-section {
+            background: var(--white);
+        }
+
+        .acordo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .acordo-card {
+            background: var(--light-gray);
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .acordo-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-gold);
+            box-shadow: 0 15px 40px var(--shadow);
+        }
+
+        .acordo-icon {
+            font-size: 56px;
+            margin-bottom: 20px;
+        }
+
+        .acordo-card h3 {
+            color: var(--primary-navy);
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .acordo-card p {
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+
+        .guarantee-box {
+            max-width: 800px;
+            margin: 60px auto;
+            background: linear-gradient(135deg, var(--primary-navy), var(--secondary-navy));
+            color: var(--white);
+            padding: 50px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 25px 60px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .guarantee-box::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            top: -150px;
+            right: -150px;
+            opacity: 0.1;
+        }
+
+        .guarantee-icon {
+            font-size: 80px;
+            margin-bottom: 25px;
+        }
+
+        .guarantee-box h3 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+        .guarantee-box p {
+            font-size: 18px;
+            line-height: 1.7;
+            opacity: 0.95;
+        }
+
+        .urgency-banner {
+            background: linear-gradient(135deg, #DC2626, #B91C1C);
+            color: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .urgency-banner h3 {
+            font-size: 28px;
+            margin-bottom: 25px;
+            font-weight: 800;
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .timer-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 25px 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            min-width: 100px;
+        }
+
+        .timer-number {
+            font-size: 48px;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .timer-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        /* 9. Q&A - Perguntas Frequentes */
+        .qa-section {
+            background: var(--light-gray);
+        }
+
+        .faq-container {
+            max-width: 900px;
+            margin: 60px auto 0;
+        }
+
+        .faq-item {
+            background: var(--white);
+            margin-bottom: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        .faq-question {
+            padding: 30px 35px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            color: var(--primary-navy);
+            font-size: 18px;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .faq-question:hover {
+            color: var(--accent-gold);
+        }
+
+        .faq-toggle {
+            width: 35px;
+            height: 35px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-navy);
+            font-size: 20px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(45deg);
+            background: var(--primary-navy);
+            color: var(--accent-gold);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 600px;
+        }
+
+        .faq-answer-content {
+            padding: 0 35px 35px;
+            color: var(--dark-gray);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        /* CTA Final */
+        .final-cta-section {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-navy) 100%);
+            color: var(--white);
+            text-align: center;
+            padding: 120px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .final-cta-section::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            top: -300px;
+            right: -200px;
+            opacity: 0.05;
+        }
+
+        .final-cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .final-cta-content h2 {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            line-height: 1.2;
+        }
+
+        .final-cta-content p {
+            font-size: 22px;
+            margin-bottom: 50px;
+            opacity: 0.95;
+        }
+
+        /* Footer */
+        .footer {
+            background: #0a1f2e;
+            color: var(--white);
+            padding: 80px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .footer-brand h3 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: var(--accent-gold);
+        }
+
+        .footer-brand p {
+            line-height: 1.7;
+            opacity: 0.8;
+            font-size: 15px;
+        }
+
+        .footer-section h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--accent-gold);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: var(--white);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--accent-gold);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+            text-align: center;
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--primary-navy);
+            cursor: pointer;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 60px;
+            }
+
+            .hero-text h1 {
+                font-size: 42px;
+            }
+
+            .historia-content {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+                gap: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-menu {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: var(--white);
+                flex-direction: column;
+                padding: 40px;
+                gap: 25px;
+                transition: left 0.3s ease;
+                box-shadow: 0 10px 30px var(--shadow);
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .section-title {
+                font-size: 36px;
+            }
+
+            .hero-text h1 {
+                font-size: 32px;
+            }
+
+            .hero-text .subtitle {
+                font-size: 18px;
+            }
+
+            .hero-stats {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+
+            .countdown-timer {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .timer-box {
+                min-width: 80px;
+                padding: 20px;
+            }
+
+            .timer-number {
+                font-size: 36px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 0 20px;
+            }
+
+            .hero-section {
+                padding-top: 120px;
+            }
+
+            section {
+                padding: 60px 0;
+            }
+           .footer-brand img {
+               filter: brightness(0) invert(1);
+            }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+            <img src="https://lh3.googleusercontent.com/d/1CAV1xbDtXy5Pz_lI0dHocMbVNcEJDUyu" alt="DomusMed" style="height: 50px; width: auto;">
+            </a>
+            <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#recursos">Recursos</a></li>
+                <li><a href="#depoimentos">Depoimentos</a></li>
+                <li><a href="#precos">Planos</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="https://www.domusmed.site/paginas/sumario.html" class="nav-cta">Começar Agora</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <section class="terms-section animate-on-scroll">
+        <div class="container">
+            <div class="terms-header">
+                <h1>Termos de Uso da Plataforma DomusMed</h1>
+                <p class="last-updated">Última atualização: 24 de novembro de 2025</p>
+            </div>
+
+            <div class="terms-content">
+                <p>Bem-vindo(a) à DomusMed! Estes Termos de Uso regem o seu acesso e uso da plataforma DomusMed, incluindo todos os conteúdos, funcionalidades e serviços oferecidos por meio dela. Ao acessar ou usar a plataforma, você concorda em cumprir e estar vinculado(a) a estes Termos. Se você não concordar com qualquer parte destes Termos, por favor, não utilize a plataforma.</p>
+
+                <h2>1. Sobre a DomusMed</h2>
+                <p>A DomusMed é uma plataforma gratuita e colaborativa, desenvolvida por médicos para médicos e estudantes de medicina, com o objetivo de facilitar o estudo direcionado para a residência médica e a prática clínica. Oferecemos resumos médicos objetivos, didáticos e revisados, com o apoio de inteligência artificial não generativa para refinar o conteúdo e potencializar o aprendizado.</p>
+                <p>Nosso compromisso é fornecer um recurso educacional acessível, confiável e constantemente atualizado, sempre alinhado com o que é cobrado nas provas de residência médica e relevante para a prática clínica no contexto brasileiro.</p>
+
+                <h2>2. Aceitação dos Termos</h2>
+                <p>Ao utilizar a plataforma DomusMed, você declara que leu, compreendeu e aceitou estes Termos de Uso em sua totalidade. Estes Termos podem ser atualizados periodicamente para refletir melhorias na plataforma, mudanças legais ou feedback da comunidade. O uso continuado da plataforma após quaisquer modificações constitui sua aceitação dessas alterações.</p>
+                <p>Recomendamos que você revise esta página regularmente para se manter informado(a) sobre quaisquer atualizações. Notificaremos sobre mudanças significativas através dos canais disponíveis na plataforma.</p>
+
+                <h2>3. Acesso e Uso da Plataforma</h2>
+
+                <h3>3.1. Gratuidade e Acesso</h3>
+                <ul>
+                    <li>A DomusMed é e sempre será uma plataforma gratuita. Não há custos associados ao acesso ou uso dos resumos e funcionalidades básicas.</li>
+                    <li>O acesso à plataforma não exige cadastro, dados pessoais ou pagamento. Nossa filosofia é democratizar o acesso ao conhecimento médico essencial.</li>
+                    <li>Você pode acessar o conteúdo de qualquer dispositivo com conexão à internet (celular, tablet, computador).</li>
+                </ul>
+
+                <h3>3.2. Conteúdo e Propósito Educacional</h3>
+                <ul>
+                    <li>O conteúdo disponibilizado na DomusMed (resumos, imagens, diagramas, fluxogramas, etc.) é para fins educacionais e de estudo, visando auxiliar na preparação para provas de residência médica e no desenvolvimento do raciocínio clínico.</li>
+                    <li><strong>Importante:</strong> As informações contidas na plataforma não substituem o julgamento clínico profissional, a consulta a fontes primárias de pesquisa, diretrizes médicas oficiais ou a orientação de um profissional de saúde qualificado.</li>
+                    <li>Embora o conteúdo seja revisado colaborativamente e refinado com IA não generativa, a DomusMed não garante a exatidão, completude ou atualidade de todas as informações em 100% do tempo. O usuário é responsável por verificar a validade e aplicabilidade das informações em seu contexto específico.</li>
+                    <li>Os resumos são organizados por especialidades médicas e baseados em módulos de cursos preparatórios para residência médica no Brasil, priorizando o conteúdo mais cobrado nas provas.</li>
+                </ul>
+
+                <h3>3.3. Uso da Inteligência Artificial</h3>
+                <ul>
+                    <li>A plataforma integra assistentes de IA (ChatGPT, OpenEvidence, Consensus, Perplexity - versões gratuitas) para auxiliar na compreensão e aprofundamento do conteúdo selecionado.</li>
+                    <li>Essas ferramentas funcionam selecionando qualquer trecho do resumo e fazendo perguntas específicas, incluindo opções pré-configuradas como "Explique para uma criança de 10 anos", "Crie um caso clínico" ou "Resuma em um parágrafo".</li>
+                    <li><strong>Atenção:</strong> As respostas geradas por IA são ferramentas de apoio educacional e não devem ser consideradas como verdades absolutas, diagnósticos médicos ou conselhos clínicos. Sempre utilize seu senso crítico, consulte fontes confiáveis e, quando aplicável, profissionais de saúde qualificados.</li>
+                    <li>A DomusMed não é responsável pelo conteúdo gerado pelas ferramentas de IA de terceiros. As respostas podem conter imprecisões, especialmente em contextos médicos complexos.</li>
+                </ul>
+
+                <h2>4. Colaboração e Conteúdo do Usuário</h2>
+
+                <h3>4.1. Sugestão de Edições e Contribuições</h3>
+                <ul>
+                    <li>A DomusMed é um projeto colaborativo. Incentivamos médicos, estudantes de medicina e outros profissionais da saúde a sugerir edições, melhorias, correções e contribuições de conteúdo.</li>
+                    <li>As sugestões podem ser enviadas através do botão "Sugerir Edição" (por e-mail ou GitHub), conforme indicado na plataforma.</li>
+                    <li>Todas as sugestões serão revisadas pela equipe da DomusMed e, quando apropriado, por colaboradores médicos qualificados antes de serem implementadas.</li>
+                    <li>A decisão final sobre a inclusão ou não de uma sugestão é da equipe da DomusMed, considerando critérios de precisão médica, relevância para provas de residência e qualidade educacional.</li>
+                    <li>Contribuições aceitas serão creditadas aos autores quando apropriado, promovendo a colaboração acadêmica.</li>
+                </ul>
+
+                <h3>4.2. Responsabilidade pelo Conteúdo Colaborativo</h3>
+                <ul>
+                    <li>Ao sugerir edições ou contribuir com conteúdo, você garante que possui os direitos necessários para fazê-lo e que sua contribuição não viola direitos autorais, marcas registradas, confidencialidade de pacientes ou quaisquer outros direitos de terceiros.</li>
+                    <li>Você concede à DomusMed uma licença não exclusiva, mundial, perpétua, irrevogável, livre de royalties, sublicenciável e transferível para usar, reproduzir, distribuir, modificar, adaptar, exibir publicamente e executar publicamente suas contribuições em conexão com a operação e promoção da plataforma.</li>
+                    <li>Os colaboradores mantêm a autoria moral de suas contribuições, mas cedem os direitos patrimoniais para uso não comercial da DomusMed.</li>
+                    <li>A DomusMed reserva-se o direito de editar, remover ou rejeitar qualquer contribuição que não atenda aos nossos padrões de qualidade ou que viole estes Termos.</li>
+                </ul>
+
+                <h2>5. Propriedade Intelectual</h2>
+                <ul>
+                    <li>Todo o conteúdo original da plataforma DomusMed, incluindo textos, gráficos, logotipos, ícones, imagens, diagramas, fluxogramas e software, é propriedade da DomusMed ou de seus colaboradores e é protegido pelas leis de direitos autorais e outras leis de propriedade intelectual aplicáveis no Brasil.</li>
+                    <li>O design, estrutura e funcionalidades da plataforma são protegidos por direitos autorais e não podem ser copiados, reproduzidos ou distribuídos sem autorização expressa.</li>
+                    <li>Você tem permissão para usar o conteúdo da DomusMed exclusivamente para fins educacionais e de estudo pessoal. O uso para fins comerciais, reprodução não autorizada, distribuição em massa ou modificação sem permissão expressa é estritamente proibido.</li>
+                    <li>Imagens, diagramas e mídias educacionais podem ter direitos autorais de terceiros (fontes médicas, instituições educacionais). Seu uso é limitado ao contexto educacional da plataforma.</li>
+                </ul>
+
+                <h2>6. Limitação de Responsabilidade</h2>
+                <ul>
+                    <li>A DomusMed é uma ferramenta educacional e não um substituto para formação médica profissional, supervisão clínica ou consulta médica.</li>
+                    <li>A DomusMed não será responsável por quaisquer danos diretos, indiretos, incidentais, especiais, consequenciais ou punitivos, incluindo, mas não se limitando a, perda de tempo de estudo, danos acadêmicos, prejuízos em provas ou qualquer outro dano resultante do seu acesso ou uso, ou incapacidade de acessar ou usar a plataforma.</li>
+                    <li>A plataforma é fornecida "como está" e "conforme disponível", sem garantias de qualquer tipo, expressas ou implícitas, incluindo, mas não se limitando a, garantias implícitas de comercialização, adequação a um fim específico, não violação ou curso de desempenho.</li>
+                    <li>Não garantimos que a plataforma estará sempre disponível, livre de erros ou interrupções. Podemos suspender temporariamente o acesso para manutenção ou atualizações.</li>
+                    <li>Você assume todos os riscos associados ao uso da plataforma para seus estudos e preparação para residência médica.</li>
+                </ul>
+
+                <h2>7. Links para Terceiros e Recursos Externos</h2>
+                <p>A plataforma DomusMed pode conter links para sites, recursos ou serviços de terceiros que não são de propriedade ou controlados pela DomusMed, incluindo:</p>
+                <ul>
+                    <li>Ferramentas de IA integradas (ChatGPT, OpenEvidence, Consensus, Perplexity);</li>
+                    <li>Fontes médicas de referência (diretrizes, artigos científicos);</li>
+                    <li>Recursos educacionais externos recomendados.</li>
+                </ul>
+                <p>Não temos controle e não assumimos responsabilidade pelo conteúdo, políticas de privacidade ou práticas de quaisquer sites ou serviços de terceiros. Você reconhece e concorda que a DomusMed não será responsável, direta ou indiretamente, por qualquer dano ou perda causada ou alegadamente causada por ou em conexão com o uso ou dependência de qualquer conteúdo, bens ou serviços disponíveis em ou através de tais sites ou serviços.</p>
+                <p>Ao usar ferramentas de IA de terceiros, você concorda com os termos de serviço dessas plataformas e assume responsabilidade pelo uso dessas ferramentas.</p>
+
+                <h2>8. Modificações dos Termos</h2>
+                <p>A DomusMed reserva-se o direito, a seu exclusivo critério, de modificar ou substituir estes Termos a qualquer momento para refletir:</p>
+                <ul>
+                    <li>Melhorias ou novas funcionalidades na plataforma;</li>
+                    <li>Mudanças nas leis ou regulamentações aplicáveis;</li>
+                    <li>Feedback da comunidade de usuários e colaboradores;</li>
+                    <li>Necessidades operacionais do projeto.</li>
+                </ul>
+                <p>Se uma revisão for material, faremos esforços razoáveis para fornecer um aviso através da plataforma ou por e-mail (se você tiver fornecido um endereço). O que constitui uma alteração material será determinado a nosso exclusivo critério.</p>
+                <p>Ao continuar a acessar ou usar nossa plataforma após essas revisões entrarem em vigor, você concorda em ficar vinculado(a) aos termos revisados. Se você não concordar com os novos termos, por favor, pare de usar a plataforma e entre em contato conosco para discutir suas preocupações.</p>
+
+                <h2>9. Lei Aplicável e Resolução de Conflitos</h2>
+                <p>Estes Termos serão regidos e interpretados de acordo com as leis da República Federativa do Brasil, sem consideração a seus conflitos de disposições legais.</p>
+                <p>Qualquer disputa, controvérsia ou reivindicação decorrente ou relacionada a estes Termos, à plataforma DomusMed ou ao uso do conteúdo será resolvida prioritariamente por meio de diálogo e mediação entre as partes.</p>
+                <p>Caso não seja possível resolver amigavelmente, você concorda que qualquer ação legal ou equitativa será apresentada exclusivamente nos tribunais competentes da cidade de Santa Maria, Estado do Rio Grande do Sul, Brasil, e você, por meio deste, consente e se submete à jurisdição pessoal de tais tribunais para os propósitos de litigar qualquer ação.</p>
+
+                <h2>10. Disposições Gerais</h2>
+                <ul>
+                    <li><strong>Inteireza dos Termos:</strong> Estes Termos constituem o acordo completo entre você e a DomusMed em relação ao uso da plataforma e substituem todos os acordos anteriores ou contemporâneos, escritos ou orais.</li>
+                    <li><strong>Severabilidade:</strong> Se qualquer disposição destes Termos for considerada inválida ou inexequível por um tribunal competente, as demais disposições permanecerão em pleno vigor e efeito.</li>
+                    <li><strong>Não Renúncia:</strong> A não execução ou demora na execução de qualquer direito ou disposição destes Termos não constituirá renúncia a tal direito ou disposição.</li>
+                    <li><strong>Cessão:</strong> Você não pode ceder ou transferir estes Termos sem o consentimento prévio por escrito da DomusMed. A DomusMed pode ceder estes Termos a qualquer momento sem aviso prévio.</li>
+                    <li><strong>Notificações:</strong> Todas as notificações legais para a DomusMed devem ser enviadas por escrito através dos canais de contato disponíveis na plataforma.</li>
+                </ul>
+
+                <h2>11. Contato e Suporte</h2>
+                <p>Se você tiver alguma dúvida sobre estes Termos, sugestões para a plataforma, preocupações sobre o conteúdo ou precisar de suporte, por favor, entre em contato conosco através dos canais disponíveis:</p>
+                <ul>
+                    <li><strong>E-mail:</strong> contato@domusmed.site</li>
+                    <li><strong>GitHub:</strong> Plataforma colaborativa para sugestões técnicas e de conteúdo. Disponível na seção "Sugerir Edição via GitHub" da plataforma</li>
+                    <li><strong>Formulário de Contato:</strong> Disponível na seção "Contato" da plataforma</li>
+                </ul>
+                <p>Estamos comprometidos em responder a todas as mensagens em até 72 horas úteis e valorizamos o feedback da comunidade médica.</p>
+
+                <div class="terms-footer">
+                    <p><strong>Obrigado por fazer parte da comunidade DomusMed!</strong></p>
+                    <p>Juntos, estamos construindo uma plataforma que realmente faz diferença no estudo e na prática da medicina. Sua colaboração e feedback são essenciais para o sucesso deste projeto.</p>
+                    <p><em>Estudo inteligente, de médicos para médicos.</em></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                    <div class="footer-brand">
+                    <img src="https://lh3.googleusercontent.com/d/1j1-oMvKa3oMvH3jOugATRqw-qdgPXpON" alt="DomusMed" style="height: 60px; width: auto; margin-bottom: 15px;">
+                      <p>
+                          Uma plataforma em construção que organiza conhecimento médico essencial de forma <strong><em>colaborativa e gratuita</em></strong>, 
+                          com suporte de IA para ajudar na compreensão e revisão, visando facilitar o estudo direcionado para residência médica e prática clínica.
+                      </p>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Navegação</h4>
+                    <ul class="footer-links">
+                        <li><a href="#home">Início</a></li>
+                        <li><a href="#recursos">Recursos</a></li>
+                        <li><a href="#depoimentos">Depoimentos</a></li>
+                        <li><a href="#precos">Planos</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Suporte</h4>
+                    <ul class="footer-links">
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#garantia">Garantia</a></li>
+                        <li><a href="https://www.domusmed.site/paginas/manual-de-instrucoes.html">Manual de Instruções</a></li>
+                        <li><a href="mailto:contato@domusmed.site">Contato</a></li>
+                        <li><a href="https://www.domusmed.site/paginas/termos-de-uso.html">Termos de Uso</a></li>
+                        <li><a href="https://www.domusmed.site/paginas/politica-de-privacidade.html">Política de Privacidade</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2025 DomusMed. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Animação ao scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        function toggleMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const navHeight = document.querySelector('.navbar').offsetHeight;
+                    const targetPosition = target.offsetTop - navHeight;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+
+                    // Fechar menu mobile após clicar
+                    const navMenu = document.getElementById('navMenu');
+                    navMenu.classList.remove('active');
+                }
+            });
+        });
+
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const faqItem = question.parentElement;
+                const isActive = faqItem.classList.contains('active');
+                
+                // Fechar todos os FAQs
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Abrir o clicado se não estava ativo
+                if (!isActive) {
+                    faqItem.classList.add('active');
+                }
+            });
+        });
+
+        // Countdown Timer
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const tomorrow = new Date();
+            tomorrow.setHours(24, 0, 0, 0);
+            const distance = tomorrow - now;
+
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        }
+
+        // Atualizar countdown a cada segundo
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Play button video (simulação)
+        const playButton = document.querySelector('.play-button');
+        if (playButton) {
+            playButton.addEventListener('click', function() {
+                alert('Aqui você integraria seu vídeo VSL (YouTube, Vimeo, Wistia, etc.)\n\nExemplo de integração:\nconst videoWrapper = document.querySelector(".video-wrapper");\nvideoWrapper.innerHTML = \'<iframe src="SUA_URL_DO_VIDEO" frameborder="0" allowfullscreen></iframe>\';');
+            });
+        }
+
+        // Controle de vagas (simulação)
+        const vagasElement = document.querySelector('.urgency-banner strong');
+        if (vagasElement) {
+            let vagas = 47;
+            setInterval(() => {
+                if (vagas > 10 && Math.random() > 0.7) {
+                    vagas--;
+                    vagasElement.textContent = vagas;
+                }
+            }, 30000); // Reduz a cada 30 segundos aleatoriamente
+        }
+
+        // Animação de entrada inicial
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '1';
+        });
+
+        // Prevenção de scroll horizontal
+        document.body.style.overflowX = 'hidden';
+
+        console.log('🏥 DomusMed - Plataforma carregada com sucesso!');
+        console.log('💡 Template de 9 passos implementado');
+        console.log('🎨 Design responsivo e interativo pronto');
+    </script>
+</body>
+</html>

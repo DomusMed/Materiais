@@ -1368,6 +1368,40 @@
            .footer-brand img {
                filter: brightness(0) invert(1);
             }
+
+            @media (max-width: 768px) {
+                .pitch-section.animate-on-scroll {
+                    opacity: 1 !important;
+                    transform: translateY(0) !important;
+                }
+				
+        /* Aplicar para todas as seções com animação em mobile */
+                .animate-on-scroll {
+                    opacity: 1 !important;
+                    transform: translateY(0) !important;
+                }
+            }
+
+            /* Fallback: Se JS não carregar, mostrar conteúdo após 2s */
+            .animate-on-scroll {
+                animation: fadeInFallback 0.8s ease-out 2s forwards;
+            }
+
+            @keyframes fadeInFallback {
+                from {
+                    opacity: 0;
+                    transform: translateY(40px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Quando JS adicionar .visible, cancelar fallback */
+            .animate-on-scroll.visible {
+                animation: none;
+            }
     </style>
 </head>
 <body>
